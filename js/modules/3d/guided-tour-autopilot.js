@@ -1,7 +1,9 @@
 import { 
   Vector3
 } from 'three';
+
 import { GuidedTour } from './guided-tour.js';
+import { AudioGuide } from './audioguide.js';
 
 
 class GuidedTourAutopilot extends GuidedTour {

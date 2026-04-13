@@ -7,6 +7,7 @@ import {
 } from 'three';
 
 import { POS_FARFAR_AWAY } from '../data/positions-constants.js';
+import { AudioGuide } from './audioguide.js';
 
 
 class Autopilot extends LineSegments {
