@@ -14,8 +14,9 @@ class SoundSystem extends AudioListener{
   static URI_INTRO = '/static/sounds/riser-aggressive.mp3';
 
   // Music
-  static MUSIC_VOLUME = 1.0;
-  static INTRO_VOLUME = 1.0;
+  static DEFAULT_MUSIC_VOLUME = 0.5;
+  static DEFAULT_INTRO_VOLUME = 1.0;
+
 
   /*
    * Attributes 
@@ -23,6 +24,9 @@ class SoundSystem extends AudioListener{
 
   #music = null;
   #audioLoader = new AudioLoader();
+  #musicVolume = null;
+  #introVolume = null;
+
 
   /*
    * Constructor
@@ -30,6 +34,8 @@ class SoundSystem extends AudioListener{
   constructor() {
     super();
     this.#music = new Audio(this);
+    this.#musicVolume = SoundSystem.DEFAULT_MUSIC_VOLUME;
+    this.#introVolume = SoundSystem.DEFAULT_INTRO_VOLUME;
     this.setMasterVolume(1.0);
   }
 
@@ -41,7 +47,7 @@ class SoundSystem extends AudioListener{
       this.#music.setBuffer(buffer);
       this.#music.setLoop(false);
       this.#music.duration = 23.5;
-      this.#music.setVolume(SoundSystem.INTRO_VOLUME);
+      this.#music.setVolume(this.#introVolume);
       this.#music.play();
     },
       xhr => {
@@ -67,7 +73,7 @@ class SoundSystem extends AudioListener{
       this.#music.setBuffer(buffer);
       this.#music.setLoop(true);
       this.#music.duration = undefined;
-      this.#music.setVolume(SoundSystem.MUSIC_VOLUME);
+      this.#music.setVolume(this.#musicVolume);
       this.#music.play();
     },
       xhr => {
@@ -80,6 +86,16 @@ class SoundSystem extends AudioListener{
     );
   }
   
+  /*
+   * Set volume
+   */
+  setVolume(level) {
+    if (this.#music) {
+      this.#musicVolume = level;
+      this.#music.setVolume(level);
+    }
+  }
+
   /*
    * Stops the SoundSystem 
    */

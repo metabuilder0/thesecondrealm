@@ -169,6 +169,15 @@ class WebXRManager extends EventTarget {
   }
 
   /*
+   * End the XR session
+   */
+  async endSession() {
+    if (this.session) {
+      await this.session.end();
+    }
+  }
+
+  /*
    * Animation loop
    */
   update(delta) {

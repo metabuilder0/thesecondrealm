@@ -31,11 +31,17 @@
 
       <p class="content">The structure of all descriptor files follows this format:</p>
       
-      <p class="content"><span class="underline">version:</span> The version of the Descriptor File format. Value should be 0.1.0</p>
+      <p class="content"><span class="underline">version:</span> The version of the Descriptor File format. Value should be 0.2.0</p>
       
       <p class="content"><span class="underline">type:</span> The type of descriptor file. Value should be "guided_tour" (manual piloting) or "guided_tour_autopilot" (autopilot mode)</p>
       
       <p class="content"><span class="underline">title:</span> The name of the Guided Tour. Value should be a string.</p>
+      
+      <p class="content"><span class="underline">lang (optional):</span> Language of the Guided Tour. Value should be a 2-letter language code (ISO 639-1). Currently supported values are: en | fr</p>
+      
+      <p class="content"><span class="underline">voice_level:</span> Volume level of the audioguide. Value should be a decimal value between 0.0 and 3.0.</p>
+      
+      <p class="content"><span class="underline">music_level:</span> Volume level of the background music. Value should be a decimal value between 0.0 and 3.0.</p>
       
       <p class="content">
         <span class="underline">coords_type:</span> The coordinate system used in the file. The value should be either "data_series" or "block_height".
@@ -95,12 +101,18 @@
 
         <p class="content">The structure of all descriptor files follows this format:</p>
         
-        <p class="content"><span class="underline">version:</span> The version of the Descriptor File format. Value should be 0.1.0</p>
+        <p class="content"><span class="underline">version:</span> The version of the Descriptor File format. Value should be 0.2.0</p>
         
         <p class="content"><span class="underline">type:</span> The type of descriptor file. Value should always be "autopilot"</p>
         
         <p class="content"><span class="underline">title:</span> The name of the Automated Wandering. Value should be a string.</p>
         
+        <p class="content"><span class="underline">lang (optional):</span> Language of the Automated Wandering. Value should be a 2-letter language code (ISO 639-1). Currently supported values are: en | fr</p>
+      
+        <p class="content"><span class="underline">voice_level:</span> Volume level of the audioguide. Value should be a decimal value between 0.0 and 3.0.</p>
+      
+        <p class="content"><span class="underline">music_level:</span> Volume level of the background music. Value should be a decimal value between 0.0 and 3.0.</p>
+      
         <p class="content">
           <span class="underline">coords_type:</span> The coordinate system used in the file. The value should be either "data_series" or "block_height".
           <ul>

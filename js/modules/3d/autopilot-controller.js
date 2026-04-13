@@ -207,6 +207,7 @@ class AutopilotController extends EventDispatcher {
     if (!this.isAnimating) {
       this.isAnimating = true;
     }
+
     // Resumes a paused animation
     if (this.isPaused && this.isAnimating) {
       this.isPaused = false;
@@ -337,11 +338,14 @@ class AutopilotController extends EventDispatcher {
                 c.values.state != Constants.ComponentState.PRESSED
               ) {
                 // Button released => Performs action
-                if (this.isRunning()) {
-                  this.pause();
-                } else {
-                  this.resume();
-                }
+                // // if (this.isRunning()) {
+                // //   this.pause();
+                // // } else {
+                // //   this.resume();
+                // // }
+                // if (!this.isRunning()) {
+                //   this.resume();
+                // }
                 this.byButtonPushed = null;
               }
             }
