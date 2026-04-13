@@ -36,6 +36,14 @@ const homeScript = {
         goToPage('#shape');
       }
     );
+
+    document.querySelector('#geograph-link').addEventListener(
+      'click', (e) => {
+        e.preventDefault();
+        goToPage('#atlas');
+      }
+    );
+
   },
 
   preparePage: () => {
