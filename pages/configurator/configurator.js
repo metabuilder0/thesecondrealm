@@ -243,6 +243,8 @@ const configScript = {
 
     const timelapseMode = document.querySelector('#activate-timelapse-radio').checked;
 
+    const boundaries = document.querySelector('#activate-boundaries-radio').checked;
+
     const sceneParams = new SceneParams({
       'name': name,
       'seriesX': serieX,
@@ -263,7 +265,8 @@ const configScript = {
       'rotation': POS_PREDEFINED[selectedPosition][1], 
       'song': selectedSong,
       'tour': organizedTourURL,
-      'timelapseMode': timelapseMode
+      'timelapseMode': timelapseMode,
+      'boundaries': boundaries
     });
 
     return sceneParams;
@@ -450,6 +453,14 @@ const configScript = {
           document.querySelector('#activate-timelapse-radio').checked = true;
         } else {
           document.querySelector('#deactivate-timelapse-radio').checked = true;
+        }
+      }
+
+      if (sceneParams.boundaries != null) {
+        if (sceneParams.boundaries) {
+          document.querySelector('#activate-boundaries-radio').checked = true;
+        } else {
+          document.querySelector('#deactivate-boundaries-radio').checked = true;
         }
       }
     }

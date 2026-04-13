@@ -89,8 +89,27 @@
     <label for="html">DEACTIVATED</label>
   </div>
 
-  <!-- SELECTION OF A SONG -->
+  <!-- DISPLAY BOUNDARIES -->
   <div id="block5" class="level1">
+    <h2 class="title">REALM BOUNDARIES</h2>
+    <p class="note">Show a white cube materializing the boundaries of the Realm.</p>
+
+    <input type="radio"
+           id="activate-boundaries-radio" 
+           name="boundaries-radio" 
+           value="activate"
+           checked>
+    <label for="html">ACTIVATED</label>
+
+    <input type="radio"
+           id="deactivate-boundaries-radio"
+           name="boundaries-radio" 
+           value="deactivate">
+    <label for="html">DEACTIVATED</label>
+  </div>
+
+  <!-- SELECTION OF A SONG -->
+  <div id="block6" class="level1">
     <h2 class="title">MUSIC (OPTIONAL)</h2>
     <p class="note">Select a song or enter the URL of a custom MP3 file (select "OTHER" in the menu).</p>
 
@@ -103,7 +122,7 @@
   </div>
 
   <!-- SELECTION OF A TOUR -->
-  <div id="block6" class="level1">
+  <div id="block7" class="level1">
     <h2 class="title">ORGANIZED TOUR (OPTIONAL)</h2>
     <p class="note">Enter the URL of a JSON file storing the organized tour.</p>
     <input id="organized-tour-url-input" 
@@ -112,7 +131,7 @@
   </div>
 
   <!-- GIVE A NAME TO THIS REALM -->
-  <div id="block7" class="level1">
+  <div id="block8" class="level1">
     <h2 class="title">NAME</h2>
     <p class="note">Give a name to this Realm before sharing it with the world.</p>
     <input id="name-input" 

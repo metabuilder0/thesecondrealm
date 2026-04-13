@@ -467,7 +467,8 @@ li {
   z-index: 10;
 }
 
-#deactivate-timelapse-radio {
+#deactivate-timelapse-radio,
+#deactivate-boundaries-radio {
   margin-left: 10px;
 }
 
