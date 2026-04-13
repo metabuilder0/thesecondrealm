@@ -9,6 +9,7 @@ import { HUD } from './hud/hud.js';
 import { GuidedTour } from './guided-tour.js';
 import { Autopilot } from './autopilot.js';
 import { GuidedTourAutopilot } from './guided-tour-autopilot.js';
+import { AudioGuide } from './audioguide.js';
 import { Camera } from './camera.js';
 import { PointsCloud } from './points-cloud.js';
 import { SoundSystem } from './sound-system.js';
@@ -45,6 +46,7 @@ class World3D {
   pointsCloud = null;
   xrManager = null;
   tour = null;
+  audioguide = null;
   selectionHelper = null;
 
   // Tour type
@@ -76,6 +78,7 @@ class World3D {
     this.#initLights();
     this.#initGrid();
     this.#initAudio();
+    this.#initAudioguide();
 
     this.renderer.renderLoopEnabled = true;
 
@@ -155,19 +158,28 @@ class World3D {
   }
 
   /*
-   * Initialize the audio elements 
+   * Initialize the selection helper
    */
   #initSelectionHelper() {
     this.selectionHelper = new SelectionHelper(this);
     this.scene.add(this.selectionHelper);
   }
+
+  /*
+   * Initialize the audio elements 
+   */
+  #initAudioguide() {
+    if (this.tourType != null) {
+      this.audioguide = new AudioGuide(this);
+    }
+  } 
   
   /*
    * Initialize the Tour 
    */
   initTour() {
     if (this.tourType == null) return;
-
+    // Initializes constants
     if (this.tourType == 'guided_tour') {
       this.tour = new GuidedTour(this);
     } else if (this.tourType == 'guided_tour_autopilot') {
@@ -180,9 +192,8 @@ class World3D {
       AutopilotController.CURVE_SLOWDOWN_SENSITIVITY = 3.0;
       AutopilotController.CURVE_SLOWDOWN_SMOOTHING = 3.0;
       AutopilotController.MAX_ANGULAR_SPEED = Math.PI / 96;
-      
     }
-
+    // Initializes event handlers
     if (this.tourType == 'guided_tour_autopilot' || this.tourType == 'autopilot') {
       this.controller.addEventListener(
         'resume', 
@@ -195,7 +206,7 @@ class World3D {
         false
       );
     }
-
+    // Adds the tour to the scene
     this.scene.add(this.tour);
   }
 
@@ -205,10 +216,13 @@ class World3D {
   async startTour(url) {
     try {
       if (this.tourType != null) {
+        // Loads the tour
         const path = await this.tour.load(url);
+        // Loading of the path by the Autopilot controller 
         if (this.tourType == 'autopilot' || this.tourType == 'guided_tour_autopilot') {
           this.controller.loadPath(path);
         }
+        // Starts the tour
         this.tour.start();
       }
     } catch (e) {
@@ -281,9 +295,9 @@ class World3D {
     if (this.tour) {
       this.tour.dispose();
     }
-    // Disposes the autopilot
-    if (this.autopilot) {
-      this.autopilot.dispose();
+    // Disposes the audioguide
+    if (this.audioguide) {
+      this.audioguide.dispose();
     }
     // Disposes the Tree of Object3D
     this.disposeObjectTree(this.scene);
@@ -299,7 +313,7 @@ class World3D {
     this.selectionHelper = null;
     this.xrManager = null;
     this.tour = null;
-    this.autopilot = null;
+    this.audioguide = null;
   }
 
   isRenderItem(obj) {

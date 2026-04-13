@@ -15,6 +15,7 @@ class Autopilot extends LineSegments {
    * Constants
    */
 
+  static DEFAULT_LANG = 'en';
   static COORD_HEIGHT = 'block_height';
   static COORD_DATA= 'data_series';
 
@@ -26,6 +27,8 @@ class Autopilot extends LineSegments {
    */
 
   #refreshCumulWait = 0;
+  #audioIntroPath = '';
+  #audioOutroPath = '';
 
   world3d = null;
 
@@ -51,6 +54,13 @@ class Autopilot extends LineSegments {
     this.setProbePosition(POS_FARFAR_AWAY[0]);
 
     this.world3d = world3d;
+
+    // Pauses audioguide on resume event notified by the controller
+    this.world3d.controller.addEventListener(
+      'resume', 
+      this.pauseAudioguide.bind(this), 
+      false
+    );
   }
 
   /*
@@ -76,6 +86,23 @@ class Autopilot extends LineSegments {
     this.initialPosition = [initPosWorld.x, initPosWorld.y, initPosWorld.z];
     // Adds initial position to the path
     path.push(this.initialPosition);
+    // Sets default audio intro and outro
+    const lang = 
+      'lang' in tourDescriptor && AudioGuide.SUPPORTED_LANGS.includes(tourDescriptor['lang'])
+      ? tourDescriptor['lang']
+      : Autopilot.DEFAULT_LANG;
+    this.#audioIntroPath = `/static/sounds/wandering_intro_${lang}.wav`;
+    this.#audioOutroPath = `/static/sounds/wandering_outro_${lang}.wav`;
+    // Sets volume of voice
+    if ('voice_level' in tourDescriptor) {
+      const voiceLevel = tourDescriptor['voice_level'];
+      this.world3d.audioguide.setVolume(voiceLevel);
+    }
+    // Sets volume of background music
+    if ('music_level' in tourDescriptor) {
+      const musicLevel = tourDescriptor['music_level'];
+      this.world3d.soundSystem.setVolume(musicLevel);
+    }
     // Builds the tour and the path
     for (let stage of tourDescriptor['stages']) {
       const pos = this.getWorld3dPosition(stage['coords']);
@@ -107,12 +134,26 @@ class Autopilot extends LineSegments {
    */
   start() {
     if (!this.isLoadingOk) return;
-    
     // Deactivates the selection tool during the tour
     this.world3d.selectionHelper.isActive = false; 
-
     this.displayIntroductoryMessage();
   } 
+
+  /*
+   * Start tour
+   */
+  startAutopilot() {
+    this.world3d.controller.resume();
+  }
+
+  /*
+   * Exit the realm
+   */
+  exit() {
+    this.exitTimeout = setTimeout(() => {
+      this.world3d.xrManager.endSession();
+    }, 4000);
+  }
 
   /*
    * On tour complete
@@ -127,9 +168,13 @@ class Autopilot extends LineSegments {
   displayIntroductoryMessage() {
     const title = `Welcome to our tour\n"${this.title}"`;
     let content1 = `You've entered The Second Realm, a purely digital space.\n\nEach point composing the point cloud in front of you represents a Bitcoin block, with its position defined by three attributes of the block.\n\n`;
-    content1 += `Our automated wandering is about to begin.\n\nWe hope that you'll enjoy the ride.`;
-    const content2 = `Press the B/Y button of the joystick to start this trip.`;
+    content1 += `Fasten your seatbelt.\n\nWe're about to start this tour.`;
+    const content2 = ``;
     this.world3d.hud.leftScreen.displayMessage(title, content1, content2);
+    this.fadein = setTimeout(() => {
+      this.world3d.audioguide.loadAudio(this.#audioIntroPath, this.startAutopilot.bind(this));
+      clearTimeout(this.fadein);
+    }, 1000);
   }
 
   /*
@@ -147,9 +192,11 @@ class Autopilot extends LineSegments {
    */
   displayGoodByeMessage() {
     const title = `Thank you!`;
-    const content1 = `This is the end of our automated wandering.\n\nWe hope that you have enjoyed your ride with us and that it has made you want to explore this realm on your own.\n\nPress the meta button to leave this realm.`;
+    let content1 = `This is the end of this tour.\n\nWe hope that you have enjoyed your ride with us.`;
+    content1 += `You will be back in the physical world in a few seconds.`;
     const content2 = ``;
     this.world3d.hud.leftScreen.displayMessage(title, content1, content2);
+    this.world3d.audioguide.loadAudio(this.#audioOutroPath, this.exit.bind(this));
   }
 
   /*
@@ -196,9 +243,25 @@ class Autopilot extends LineSegments {
   }
 
   /*
+   * Temporarily sets the audioguide on pause
+   */
+  pauseAudioguide() {
+    this.world3d.audioguide.stop();
+  }
+
+  /*
    * Dispose 
    */
   dispose() {
+    // Clears event listeners
+    this.world3d.controller.removeEventListener(
+      'resume',
+      this.pauseAudioguide.bind(this)
+    );
+    // Clears timeouts
+    if (this.exitTimeout) {
+      clearTimeout(this.exitTimeout); 
+    }
     // Resets the references to others objects
     this.world3d = null;
     this.curve = null;
