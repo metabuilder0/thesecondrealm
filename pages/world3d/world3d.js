@@ -89,7 +89,8 @@ const world3dScript = {
     let gridContainer = document.getElementById('container');
     world3dScript.world3d = new World3D(
       gridContainer, 
-      world3dScript.tourType
+      world3dScript.tourType,
+      sceneParams.boundaries
     );
     world3dScript.world3d.xrManager.addEventListener(
       'sessionend', 

@@ -50,6 +50,9 @@ class World3D {
   // Tour type
   tourType = null;
 
+  // Show boundaries
+  showBoundaries = true;
+
   // Boolean flag indicating if loading has completed
   immersionModeActivated = false;
 
@@ -57,10 +60,11 @@ class World3D {
   /*
    * Constructor
    */
-  constructor(container, tourType) {
+  constructor(container, tourType, showBoundaries) {
     //Cache.enabled = true;
     this.container = container;
     this.tourType = tourType;
+    this.showBoundaries = showBoundaries;
   
     this.scene = new Scene();
     this.#initCamera();
@@ -136,9 +140,11 @@ class World3D {
    * Initialize the grid
    */
   #initGrid() {
-    let cube = new Cube();
-    this.scene.add(cube);
-    cube.build(CUBE_SIZE, 0x1f1f1f);
+    if (this.showBoundaries) {
+      let cube = new Cube();
+      this.scene.add(cube);
+      cube.build(CUBE_SIZE, 0x1f1f1f);
+    }
   }
 
   /*
