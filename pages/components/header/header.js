@@ -1,24 +1,14 @@
 const headerScript = {
-
-  pages: [
-    '#home',
-    '#explore',
-    '#configurator',
-    '#tell',
-    '#shape',
-    '#atlas'
-  ],
+  pages: ['#home', '#explore', '#configurator', '#tell', '#shape', '#atlas'],
 
   initComponent: () => {
     // Sets the event handlers
     for (let page of headerScript.pages) {
       const link = page + '-link';
-      document.querySelector(link).addEventListener(
-        'click', (e) => {
-          e.preventDefault();
-          goToPage(page);
-        }
-      );
+      document.querySelector(link).addEventListener('click', (e) => {
+        e.preventDefault();
+        goToPage(page);
+      });
     }
   },
 
@@ -43,11 +33,12 @@ const headerScript = {
       }
     }
   },
-
 };
 
 componentScripts.set('#header', headerScript);
 
-waitForElement("#shape-link", 1000).then(() => {
-  headerScript.initComponent();
-}).catch(() => {});
+waitForElement('#shape-link', 1000)
+  .then(() => {
+    headerScript.initComponent();
+  })
+  .catch(() => {});

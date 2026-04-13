@@ -9,3 +9,5 @@ static/videos/
 static/webxr/
 fiveserver.config.js
 urls.txt
+.DS_Store
+**/.DS_Store
