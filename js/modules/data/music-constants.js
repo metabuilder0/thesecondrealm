@@ -16,6 +16,8 @@ export const SONGS = {
   'CHANT II': '/static/music/17.mp3',
   'INTO THE MIX': '/static/music/18.mp3',
   'PIANO': '/static/music/19.mp3',
+  'HORROR BEATBOXING 4': '/static/music/20.mp3',
+  'TRACE EVIDENCE': '/static/music/21.mp3',
   'OTHER': 'other',
 };
 
