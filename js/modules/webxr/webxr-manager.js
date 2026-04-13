@@ -125,12 +125,13 @@ class WebXRManager extends EventTarget {
         assetPath = tokens.join('/');
         const motionController = new MotionController(inputSource, profile, assetPath);
 
+        if (!this.loader) return;
         await this.loader.load(motionController.assetUrl, (glb) => {
+          if (!this.isActive) return;
           let controllerModel = glb.scene;
           controller.clear();
           controller.add(controllerModel);
           this.controllers.push(motionController);
-
         }, undefined, (error) => {
           console.error(error);
         });   
@@ -192,10 +193,10 @@ class WebXRManager extends EventTarget {
       controller.removeEventListener('disconnected', this.onInputSourcesChange.bind(this));
     }
 
+    this.controllers = null;
+    this.loader = null;
     this.world3d = null;
     this.session = null;
-    this.loader = null;
-    this.controllers = null;
   }
 
 }
