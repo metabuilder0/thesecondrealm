@@ -730,12 +730,25 @@ li {
   background-image: url(/static/images/mini_5c.jpg);
 }
 
-#realm10 {
+#realm10, 
+#realm10b {
   background-image: url(/static/images/mini_5b.jpg);
 }
 
 #realm11 {
   background-image: url(/static/images/mini_7d.jpg);
+}
+
+#realm12 {
+  background-image: url(/static/images/mini_7c.jpg);
+}
+
+#realm13 {
+  background-image: url(/static/images/mini_15c.jpg);
+}
+
+#realm14 {
+  background-image: url(/static/images/mini_15b.jpg);
 }
 
 /**
