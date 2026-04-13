@@ -15,6 +15,7 @@ export const SONGS = {
   'EMOTIONAL VOCAL TRAILER': '/static/music/16.mp3',
   'CHANT II': '/static/music/17.mp3',
   'INTO THE MIX': '/static/music/18.mp3',
+  'PIANO': '/static/music/19.mp3',
   'OTHER': 'other',
 };
 
