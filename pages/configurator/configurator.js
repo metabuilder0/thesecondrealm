@@ -151,6 +151,10 @@ const configScript = {
     document.querySelector('#music-select').addEventListener(
       'change', () => { configScript.onMusicChange(); }
     );
+
+    document.querySelector('#position-select').addEventListener(
+      'change', () => { configScript.onPositionChange(); }
+    );
   },
 
   /*
@@ -226,8 +230,38 @@ const configScript = {
     }
     
     const selectedPosition = document.querySelector('#position-select').value;
+    let position = [0,0,0];
+    let rotation = [0,0,0];
+
     if (selectedPosition == null) {
-      selectedPosition = '(0.0, 0.0, 0.0)';
+      selectedPosition = 'ORIGIN';
+      position = POS_PREDEFINED[selectedPosition][0];
+      rotation = POS_PREDEFINED[selectedPosition][1];
+    }
+
+    try {
+      position = document.querySelector('#position-input').value.split(',').map(
+        (content, _) => {
+          const coord = parseFloat(content.trim());
+          if (isNaN(coord)) {
+            throw 'coordinate is not a number';
+          } else {
+            return coord;
+          }    
+        });
+      rotation = document.querySelector('#rotation-input').value.split(',').map(
+        (content, _) => {
+          const coord = parseFloat(content.trim());
+          if (isNaN(coord)) {
+            throw 'coordinate is not a number';
+          } else {
+            return coord;
+          }   
+        });
+    } catch (e) {
+      // Invalid position or rotation => Default to origin
+      position = POS_PREDEFINED['ORIGIN'][0];
+      rotation = POS_PREDEFINED['ORIGIN'][1];
     }
 
     let selectedSong = document.querySelector('#music-select').value;
@@ -261,8 +295,8 @@ const configScript = {
       'filterMaxY': filterMaxY,
       'filterMinZ': filterMinZ,
       'filterMaxZ': filterMaxZ,
-      'position': POS_PREDEFINED[selectedPosition][0],
-      'rotation': POS_PREDEFINED[selectedPosition][1], 
+      'position': position,
+      'rotation': rotation, 
       'song': selectedSong,
       'tour': organizedTourURL,
       'timelapseMode': timelapseMode,
@@ -394,13 +428,24 @@ const configScript = {
       if (sceneParams.position == null) {
         document.querySelector('#position-select').selectedIndex = 0;
       } else {
+        let found = false;
         Object.keys(POS_PREDEFINED).forEach(k => {
           if (POS_PREDEFINED[k][0][0] == sceneParams.position[0]
             && POS_PREDEFINED[k][0][1] == sceneParams.position[1]
-            && POS_PREDEFINED[k][0][2] == sceneParams.position[2]) {
+            && POS_PREDEFINED[k][0][2] == sceneParams.position[2]
+            && POS_PREDEFINED[k][1][0] == sceneParams.rotation[0]
+            && POS_PREDEFINED[k][1][1] == sceneParams.rotation[1]
+            && POS_PREDEFINED[k][1][2] == sceneParams.rotation[2]) {
             document.querySelector('#position-select').value = k;
+            found = true;
           }
         });
+        if (!found) {
+          document.querySelector('#position-select').value = 'OTHER';
+          document.querySelector('#position-div').removeAttribute('hidden');
+        }
+        document.querySelector('#position-input').value = `${sceneParams.position[0]}, ${sceneParams.position[1]}, ${sceneParams.position[2]}`;
+        document.querySelector('#rotation-input').value = `${sceneParams.rotation[0]}, ${sceneParams.rotation[1]}, ${sceneParams.rotation[2]}`;
       }
 
       if (configScript.isInt(sceneParams.filterMinH)) {
@@ -528,6 +573,19 @@ const configScript = {
       document.querySelector('#music-input').removeAttribute('hidden');
     } else {
       document.querySelector('#music-input').setAttribute('hidden', '');
+    }
+  },
+
+  onPositionChange: () => {
+    const selectedPosition = document.querySelector('#position-select').value;
+    if (selectedPosition == 'OTHER') {
+      document.querySelector('#position-input').value = '';
+      document.querySelector('#rotation-input').value = '';
+      document.querySelector('#position-div').removeAttribute('hidden');
+    } else {
+      document.querySelector('#position-div').setAttribute('hidden', '');
+      document.querySelector('#position-input').value = POS_PREDEFINED[selectedPosition][0];
+      document.querySelector('#rotation-input').value = POS_PREDEFINED[selectedPosition][1];
     }
   },
 
