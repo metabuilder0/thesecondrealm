@@ -14,6 +14,8 @@ var pages = [
   '#credits'
 ];
 
+var appVersion; 
+
 var loadedPages = [];
 
 var initializedPages = [];
