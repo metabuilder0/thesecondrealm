@@ -126,7 +126,7 @@ class PointsCloud extends Points {
    */
   update(delta) {
     const animLag = 2016;
-    const iterSize = 36;
+    const iterSize = 9;
     
     if (this.animIdx >= this.nbPoints + animLag)
       return
