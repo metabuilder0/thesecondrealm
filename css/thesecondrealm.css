@@ -197,12 +197,6 @@ li {
   margin: 10px;
 }
 
-#payload-utils-table {
-  width: 100%;
-  height: 100%;
-  margin: 10px;
-}
-
 #payload-utils-table td {
   text-align: center;
 }
@@ -213,6 +207,31 @@ li {
 #troubleshooting-table .title {
   font-size: 24pt;
   font-weight: 300;
+}
+
+/**
+ * Audioguide Generator tool
+ */
+#audioguide-generator-table {
+  width: 100%;
+  height: 100%;
+  margin: 5px;
+}
+
+#audioguide-generator-table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#audioguide-generator-table td.intro {
+  padding: 1% 5% 1% 5%;
+  text-align: left;
+  font-size: 12pt;
+  font-weight: 400;
+}
+
+#audioguide-generator-table #generate-btn {
+  margin-top: 100px;
 }
 
 /**
