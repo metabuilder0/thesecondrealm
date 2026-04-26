@@ -69,6 +69,15 @@ class DataStore {
     const loaderFn = d3.json.bind(this);
     return loaderFn(url);
   }
+
+  /**
+   * Get the descriptor file 
+   * of a kiosk
+   */
+  async getKioskDescriptorFile(url) {
+    const loaderFn = d3.json.bind(this);
+    return loaderFn(url);
+  }
   
 }
 
