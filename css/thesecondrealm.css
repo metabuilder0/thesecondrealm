@@ -661,6 +661,10 @@ li {
   justify-content: end !important;
 }
 
+#kiosk-section2 .level1 .title {
+  margin: 4em 0 1em 0;
+}
+
 .row {
   width: 80%;
   display: flex;
@@ -668,7 +672,7 @@ li {
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin: 6em 10% 2em 10%;
+  margin: 3em 10% 2em 10%;
 }
 
 .card {
@@ -1227,6 +1231,10 @@ li {
   #kiosk-section2 {
     padding-top: 3.5em;
     padding-bottom: 4em;
+  }
+
+  #kiosk-section2 .level1 .note {
+    margin: 0 0 3em 0;
   }
 
   #atlas-section2 .row,

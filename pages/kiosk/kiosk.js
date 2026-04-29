@@ -38,15 +38,43 @@ const kioskScript = {
     const kioskDescriptor = await dataStore.getKioskDescriptorFile(kioskUrl);
     if (!kioskDescriptor) return;
 
-    const realms = kioskDescriptor['realms'];
-    if (realms.length == 0) return;
+    const collections = kioskDescriptor['collections'];
+    if (collections.length == 0) return;
 
     document.querySelector('#title-h1').innerHTML = kioskDescriptor['title'];
     document.querySelector('#desc-p').innerHTML = kioskDescriptor['text_intro'];
     document.querySelector('#kiosk-section1').style.backgroundImage = `url(${kioskDescriptor['visual']})`;
 
+    for (let collection of collections) {
+      kioskScript.loadCollection(collection);
+    }
+  },
+
+
+  loadCollection: (collection) => {
+    const realms = collection['realms'];
+    if (realms.length == 0) return;
+
     const nbLines = Math.floor(realms.length / kioskScript.NB_CARDS_PER_ROW);
     const nbRealmsLastLine = realms.length % kioskScript.NB_CARDS_PER_ROW;
+
+    // Adds Title and description if needed
+    const level1Div = document.createElement('div');
+    level1Div.setAttribute('class', 'level1');
+    const titleH2 = document.createElement('h2');
+    titleH2.setAttribute('class', 'title');
+    if (Object.hasOwn(collection, 'title')) {
+      titleH2.innerHTML = collection['title'];
+    }
+    level1Div.appendChild(titleH2);
+
+    const descP = document.createElement('p');
+    descP.setAttribute('class', 'note');
+    if (Object.hasOwn(collection, 'desc')) {
+      descP.innerHTML = collection['desc'];
+    }
+    level1Div.appendChild(descP);
+    document.querySelector('#kiosk-section2').appendChild(level1Div);
 
     // Adds nbLines lines of realms
     for (let i=0; i < nbLines; i++) {
@@ -81,6 +109,13 @@ const kioskScript = {
         );
         rowDiv.appendChild(cardDiv);
       }
+      for (let j=0; j < kioskScript.NB_CARDS_PER_ROW - nbRealmsLastLine; j++) {
+        const cardDiv = document.createElement('div');
+        cardDiv.setAttribute('class', 'card');
+        cardDiv.style.visibility = 'hidden';
+        rowDiv.appendChild(cardDiv);
+      }
+
       document.querySelector('#kiosk-section2').appendChild(rowDiv);
     }
   },

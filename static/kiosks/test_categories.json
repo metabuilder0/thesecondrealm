@@ -1,9 +1,11 @@
 {
   "version": "0.1.0",
   "title": "THE SECOND REALM ATLAS",
-  "text_intro": "A collection of realms to explore",
+  "text_intro": "Test of a kiosk page with named collections",
   "visual": "/static/images/tsr_11.jpg",
   "collections": [{
+    "title": "DEMOS",
+    "desc": "Demos of Guided Tours, Automated Guided Tours, Automated Wanderings, Timelapse mode.",
     "realms": [{
       "name": "THE BITCOIN TSUNAMI (TOUR)",
       "desc": "The Bitcoin wave is about to sweep the shore. A demo of a realm with a Guided Tour.",
@@ -24,7 +26,30 @@
       "desc": "The beauty of the Northern lights. A demo of a realm with an Automated Wandering.",
       "url": "index.html?r=JznebnfwKNouTYkv95bBQntrfrE4QuTPgc4hN8UVZzfME3juXU92BFZLwckugjgmjVioVwSwjaM3Vgm7Czbj8RWKsJPvjCL5VCDDVQkhK9vkF5g8Pg2QNryjkiMrGGwNNgxw7KFYj2Jk9NPDgtbU3pWcAkm7cDJ8aUcY4acZwShLv2Gw3oAEzLRMc2jizPjmgJTZGs9D9655yXaDcd5Ry4zoCuPqdDBTRx6LJTcqPNzGHrFAFkJgLCQSF4SWVSr24C6vwnJMYzWwfcrafUPpAvnvqP6tghbBaEWxfWu1XVEZUC2Fos3NKw3fKM4MCFG3YoC6QwuPThyBiLDfd3TbYMMt1eeUAyUBWMmt9iTR6Vt5SteSd1vTXTKvKdhrPDVTQo4bng4bakGKogWAt1uDBxY",
       "visual": "/static/images/mini_15.jpg"
+    }]
+  }, {
+    "title": "THE PATOSHI COLLECTION",
+    "desc": "A collection of realms related to the Patoshi's pattern.",
+    "realms": [{
+      "name": "SATURDAY NONCE FEVER (TIMELAPSE)",
+      "desc": "A tribute to the OG Big-Endian. Elusive as a fingerprint dissolving into randomness.",
+      "url": "index.html?r=pjSoTd591JbPTVLfHzYVT33JSRsqgfSLWa4AHHmcpePT7XtbqD9Q5SrTerQBGAk18R5o25PbVS2xo6gfPpu6fqms6yLZsxkX9dZArWb24wkDrW1FDZw46rt3gXFBijk5C3eS5X6c6g2RDaiSZJWVzWmZ4knj7nZ3hWXfHo3gQNzNXPZcVfn7xk4MGLk9ZMSZ7UcJekrDZpg11oPBYAodtXShqfPXDkgDqx2o1Qqf3LAKZeeHqrmSRKkkqq5D8HzeG5niPv",
+      "visual": "/static/images/mini_7c.jpg"
     }, {
+      "name": "THE STARRY NONCES",
+      "desc": "Where Bitcoin extranonces meet Van Gogh.",
+      "url": "index.html?r=4DKrLEMMhjH7aNAf2ucGjov4ZXbZD53TfuuSdpeA5JpEvvGYjED2Z5nW5MjY24bgzpqSCdP8FPpSpoLMbDb7ZVk48LbSJVPg31hQsuB9iUojfkHBaQveXeCPxXS68V2AuymhsBEjP8nGfU7Ed6Nkvj6VC3YDUe4P5zHgS7f4p9wxevcdbEz3xQJKwDg1XbwRhGKAPKSYUpLHdacxNA9pu98jkD1W68iBW1vt7LvSbubYemCES5L4uvEmzRqhb5AEbEqsWfyM8hSkdKHPW1jxDYGrFUTLeKgiDjxiuKcytRDuSB9Rn",
+      "visual": "/static/images/mini_15c.jpg"
+    }, {
+      "name": "PATOSHI'S BOX",
+      "desc": "\"Don't open the noisy box, Pandora.\"",
+      "url": "index.html?r=At4n3S9oaBfzK4D3uURpoUZcSoEUCGQ24g63J7DusvxCq1pnNUWMVwShqjqjXsPkv5RHTrGUnVgVt7MQ7HhjEBVBXDf39iFwy6iJbTeA3n9oPr3KB7JN2DGwAkYRLTMsMnzxaEzJ9RZiVGKwz9c55FJHaHTVJy4uJGgthAoR7heYNzQLL1vVpYi7rGVHDKLLvU1LXmnvdWepnLntK7ApM9nTA66PDxUJeMM72o9VNzGphFwZbenrNY",
+      "visual": "/static/images/mini_15b.jpg"
+    }]
+  }, {
+    "title": "THE EXPLORERS CLUB",
+    "desc": "A collection of realms to explore manually.",
+    "realms": [{
       "name": "BOREALIS",
       "desc": "The original Borealis realm, in manual piloting mode.",
       "url": "index.html?r=2YpDj2PcpJjfduFrcLCoowsrLTn1knkNJkv6w5H2g7YQZigyQmaq5TSJ4yLCdosWvpEWGSRJxnKSrPY1DueobiHLAP7TPFtVvcsgVhnLVMEtjqe8J1g9WcioDTtw4HcZL6cXcSGTU1PJBEFpLwVnvrA4dJ66NJg4JwJWkyyn9pMpL8oyD8B4GJJoEoMCTe8FwMSKcfpAoQ85CMLTbSKxKwMgzYiVoaWZMfZdYGSqzPyRuWvMqSCNNFPGcQNtF2z8EtcpPoeiYf2RnwfdhYp6BiYkQVu8LSaGAbcx2bSVWTqC4qAxsHAabM5uGoxRAtMpUQbQkASkbioh2r4UUdQyPGywY5UoT7bbLGtiAe8qaCfDLZ1e",
@@ -74,21 +99,6 @@
       "desc": "Visit the pyramid of the moon and its famous stairs.",
       "url": "index.html?r=84XmCYEFFtuvZc8PAVGdBCWsUgZyQ5ZKabBfKvUJ6zBear77kCUX27Nn6C51PfpHbadBBgLxKgf4Lt56KB71KY9BfNutGfu3ExESUNk9aAdoci9Bq86X4sgTsnE4Kz7CYCwpr4v4WfAWxRyYgkNQm3vyLLpcFHp9U66GYVdeoHm5xt5kLvzWwqeEBiFBH8y23A7Gtd882grBKay8CsEvt37bVtnoy2JbJ5jpT2YkUV4ty6NhEtLqquyzSBKrv3tc6Y8KWj6kkYHAojZDGGKxxpLhyi1wyHgq6SLn4aXckBbMoeutHte3YMAEQ",
       "visual": "/static/images/mini_7d.jpg"
-    }, {
-      "name": "SATURDAY NONCE FEVER (TIMELAPSE)",
-      "desc": "A tribute to the OG Big-Endian. Elusive as a fingerprint dissolving into randomness.",
-      "url": "index.html?r=pjSoTd591JbPTVLfHzYVT33JSRsqgfSLWa4AHHmcpePT7XtbqD9Q5SrTerQBGAk18R5o25PbVS2xo6gfPpu6fqms6yLZsxkX9dZArWb24wkDrW1FDZw46rt3gXFBijk5C3eS5X6c6g2RDaiSZJWVzWmZ4knj7nZ3hWXfHo3gQNzNXPZcVfn7xk4MGLk9ZMSZ7UcJekrDZpg11oPBYAodtXShqfPXDkgDqx2o1Qqf3LAKZeeHqrmSRKkkqq5D8HzeG5niPv",
-      "visual": "/static/images/mini_7c.jpg"
-    }, {
-      "name": "THE STARRY NONCES",
-      "desc": "Where Bitcoin extranonces meet Van Gogh.",
-      "url": "index.html?r=4DKrLEMMhjH7aNAf2ucGjov4ZXbZD53TfuuSdpeA5JpEvvGYjED2Z5nW5MjY24bgzpqSCdP8FPpSpoLMbDb7ZVk48LbSJVPg31hQsuB9iUojfkHBaQveXeCPxXS68V2AuymhsBEjP8nGfU7Ed6Nkvj6VC3YDUe4P5zHgS7f4p9wxevcdbEz3xQJKwDg1XbwRhGKAPKSYUpLHdacxNA9pu98jkD1W68iBW1vt7LvSbubYemCES5L4uvEmzRqhb5AEbEqsWfyM8hSkdKHPW1jxDYGrFUTLeKgiDjxiuKcytRDuSB9Rn",
-      "visual": "/static/images/mini_15c.jpg"
-    }, {
-      "name": "PATOSHI'S BOX",
-      "desc": "\"Don't open the noisy box, Pandora.\"",
-      "url": "index.html?r=At4n3S9oaBfzK4D3uURpoUZcSoEUCGQ24g63J7DusvxCq1pnNUWMVwShqjqjXsPkv5RHTrGUnVgVt7MQ7HhjEBVBXDf39iFwy6iJbTeA3n9oPr3KB7JN2DGwAkYRLTMsMnzxaEzJ9RZiVGKwz9c55FJHaHTVJy4uJGgthAoR7heYNzQLL1vVpYi7rGVHDKLLvU1LXmnvdWepnLntK7ApM9nTA66PDxUJeMM72o9VNzGphFwZbenrNY",
-      "visual": "/static/images/mini_15b.jpg"
     }]
   }]
 }
