@@ -73,8 +73,8 @@ class World3D {
     this.#initRenderer();
     this.#initController();
     this.#initSelectionHelper();
-    this.#initHUD();
     this.#initXrSession();
+    this.#initHUD();
     this.#initLights();
     this.#initGrid();
     this.#initAudio();
