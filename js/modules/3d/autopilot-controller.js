@@ -25,8 +25,6 @@ class AutopilotController extends EventDispatcher {
   static EPS = 0.000001;
   // SPEED
   static SPEED = 3000;
-  // YAW DAMPING
-  static YAW_DAMPING = 2.0;
   // MAX ANGULAR SPEED 
   static MAX_ANGULAR_SPEED = Math.PI / 96;
   // SLOWDOWN FACTOR
@@ -285,8 +283,7 @@ class AutopilotController extends EventDispatcher {
       this.lastPosition.copy(object.position);
       
       // Damps the yaw
-      const alpha = 1 - Math.exp(-AutopilotController.YAW_DAMPING * delta);
-      this.currentYaw = this.lerpAngles(this.currentYaw, pose.yaw, alpha, delta);
+      this.currentYaw = this.lerpAngles(this.currentYaw, pose.yaw, delta);
       this.previousYaw = this.currentYaw;
       
       // Sets camera rotation
@@ -337,7 +334,7 @@ class AutopilotController extends EventDispatcher {
                 c.id == this.byButtonPushed &&
                 c.values.state != Constants.ComponentState.PRESSED
               ) {
-                // Button released => Performs action
+                // // Button released => Performs action
                 // // if (this.isRunning()) {
                 // //   this.pause();
                 // // } else {
@@ -385,14 +382,14 @@ class AutopilotController extends EventDispatcher {
   }
 
   /*
-   * Lerps angles
+   * Lerps angles 
    */
-  lerpAngles(a, b, t, delta) {
+  lerpAngles(a, b, delta) {
     let diff = b - a;
     diff = ((diff + Math.PI) % (Math.PI * 2)) - Math.PI;
     const maxDeltaYaw = AutopilotController.MAX_ANGULAR_SPEED * delta;
     diff = Math.max(-maxDeltaYaw, Math.min(maxDeltaYaw, diff));
-    return a + diff * t;
+    return a + diff;
   }
 
   /*
