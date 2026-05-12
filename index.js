@@ -15,6 +15,14 @@ function openWorld3d(param) {
 }
 
 /*
+ * Open kiosk passed in URL params 
+ */
+function openKiosk(urlKiosk) {
+  sessionStorage.setItem('urlKiosk', urlKiosk);
+  goToPage('#kiosk');
+}
+
+/*
  * UI INITIALIZATION
  */
 
@@ -49,8 +57,11 @@ function initPages() {
   const urlParams = new URLSearchParams(window.location.search);
   const p = urlParams.get('p');
   const r = urlParams.get('r');
+  const k = urlParams.get('k');
   if (r != null) {
     openWorld3d(r);
+  } else if (k != null) {
+    openKiosk(k);
   } else if (p != null) {
     goToPage('#'+p);
   } else {

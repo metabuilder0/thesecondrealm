@@ -17,8 +17,8 @@ const headerScript = {
    */
   refresh: () => {
     const activePage = sessionStorage.getItem('activePage');
-    // Don't display the header on the home page
-    if (activePage == '#home' || activePage == '#world3d') {
+    // Don't display the header on the home and kiosk pages
+    if (activePage == '#home' || activePage == '#kiosk' || activePage == '#world3d') {
       document.querySelector('#header').setAttribute('hidden', '');
     } else {
       document.querySelector('#header').removeAttribute('hidden');

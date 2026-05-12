@@ -19,7 +19,14 @@ const footerScript = {
   /*
    * Refreshes the component when active page change
    */
-  refresh: () => {},
+  refresh: () => {
+    const activePage = sessionStorage.getItem('activePage');
+    // Don't display the footer on the kiosk page
+    const isKioskMode = sessionStorage.getItem('appMode') == APP_MODE_KIOSK;
+    if (activePage == '#kiosk' || (activePage == '#world3d' && isKioskMode)) {
+      document.querySelector('#footer').setAttribute('hidden', '');
+    }
+  },
 
 };
 

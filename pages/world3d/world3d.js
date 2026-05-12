@@ -33,7 +33,13 @@ const world3dScript = {
     );
 
     document.querySelector('#cancel-btn').addEventListener(
-      'click', () => { window.location.href='https://www.federalreserve.gov/'; }
+      'click', () => { 
+        if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+          goToPage('#kiosk');
+        } else {
+          window.location.href='https://www.federalreserve.gov/';
+        }
+      }
     );
 
     document.querySelector('#back-btn').addEventListener(
@@ -223,7 +229,11 @@ const world3dScript = {
     );
     world3dScript.world3d.dispose();
     world3dScript.world3d = null;
-    goToPage('#configurator');
+    if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+      goToPage('#kiosk');
+    } else {
+      goToPage('#configurator');
+    }
   },
 
   /*

@@ -11,9 +11,15 @@ var pages = [
   '#shape',
   '#atlas',
   '#world3d',
-  '#credits'
+  '#credits',
+  '#kiosk'
 ];
+ 
+// App mode (web|kiosk)
+const APP_MODE_WEB = 'web';
+const APP_MODE_KIOSK = 'kiosk';
 
+// App version
 var appVersion; 
 
 var loadedPages = [];

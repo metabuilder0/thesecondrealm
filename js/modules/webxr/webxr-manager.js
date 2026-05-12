@@ -5,6 +5,15 @@ import {
   MotionController 
 } from '/js/libs/@webxr-input-profiles/motion-controllers.module.js';
 
+import {
+  BufferGeometry,
+  Line,
+  LineBasicMaterial,
+  Matrix4,
+  Raycaster,
+  Vector3
+} from 'three';
+
 
 class WebXRManager extends EventTarget {
 
@@ -29,6 +38,9 @@ class WebXRManager extends EventTarget {
 
   static ASSETS_URI = '/static/webxr/profiles'
 
+  static MAX_CLICK_DURATION = 800;
+  static INTERSECTION_TOLERANCE = 120;
+
 
   /*
    * Attributes
@@ -39,6 +51,27 @@ class WebXRManager extends EventTarget {
   loader = null;
   controllers = [];
   isActive = false;
+
+  raycaster = new Raycaster();
+  tempMatrix = new Matrix4();
+
+  // Interactive objects 
+  selectableObjects = [];
+  
+  // Controllers states
+  controllerStates = [{ 
+    controller: null,
+    pressedObject: null,
+    pressStartTime: 0,
+    lastIntersectionTime: 0,
+    currentHoveredObject: null
+  }, {
+    controller: null,
+    pressedObject: null,
+    pressStartTime: 0,
+    lastIntersectionTime: 0,
+    currentHoveredObject: null
+  }];
 
   // Hack (required for some browsers) 
   #xrSessionIsGranted = false;
@@ -53,12 +86,16 @@ class WebXRManager extends EventTarget {
     this.world3d = world3d;
     this.loader = new GLTFLoader();
 
-    // Initializes the controller objects
+    // Initializes the controller and controller grip objects
     for (let i = 0; i < 2; ++i) {
-      const controller = this.world3d.renderer.xr.getControllerGrip(i);
+      const controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+      if (controllerGrip == null) continue;
+      controllerGrip.addEventListener('connected', this.onInputSourcesChange.bind(this));
+      controllerGrip.addEventListener('disconnected', this.onInputSourcesChange.bind(this));
+      this.world3d.camera.parent.add(controllerGrip);
+
+      const controller = this.world3d.renderer.xr.getController(i);
       if (controller == null) continue;
-      controller.addEventListener('connected', this.onInputSourcesChange.bind(this));
-      controller.addEventListener('disconnected', this.onInputSourcesChange.bind(this));
       this.world3d.camera.parent.add(controller);
     }
 
@@ -103,19 +140,43 @@ class WebXRManager extends EventTarget {
   }
 
   /*
+   * Declare a 3D object as interactive
+   */
+  makeInteractive(object, callbacks = {}) {
+    object.userData = {
+      ...object.userData,
+      onClick: callbacks.onClick || null,
+      onPress: callbacks.onPress || null,
+      onPointerOver: callbacks.onPointerOver || null,
+      onPointerOut: callbacks.onPointerOut || null,
+      isInteractive: true,
+    };
+
+    if (!this.selectableObjects.includes(object)) {
+      this.selectableObjects.push(object);
+    }
+  }
+
+  /*
    * onInputSourcesChange event handler
    */
   async onInputSourcesChange(e) {
     try {
       if (!this.isActive) return;
 
-      this.controllers = [];
+      this.clearControllers();
 
       for (let i = 0; i < 2; i++) {
         let inputSource = this.world3d.renderer.xr.getInputSource(i);
         if (inputSource == null) continue;
-        
-        let controller = this.world3d.renderer.xr.getControllerGrip(i);
+
+        let controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+
+        const ctrl = this.controllerStates[i];
+        ctrl.controller = this.world3d.renderer.xr.getController(i);
+        ctrl.controller.add(this.buildLaserLine());
+        ctrl.controller.addEventListener('selectstart', (e) => this.onSelectStart(i, e).bind(this));
+        ctrl.controller.addEventListener('selectend', (e) => this.onSelectEnd(i, e).bind(this));
         
         let {profile, assetPath} = await fetchProfile(inputSource, WebXRManager.ASSETS_URI);
 
@@ -126,16 +187,18 @@ class WebXRManager extends EventTarget {
         const motionController = new MotionController(inputSource, profile, assetPath);
 
         if (!this.loader) return;
+
         await this.loader.load(motionController.assetUrl, (glb) => {
           if (!this.isActive) return;
+          // Attaches the model to the controller grip
           let controllerModel = glb.scene;
-          controller.clear();
-          controller.add(controllerModel);
-          this.controllers.push(motionController);
+          controllerGrip.clear();
+          controllerGrip.add(controllerModel);
+          // Adds motionController to the array of controllers
+          this.controllers[i] = motionController;
         }, undefined, (error) => {
           console.error(error);
         });   
-
       }
     } catch (e) {
       console.error(e);
@@ -183,26 +246,216 @@ class WebXRManager extends EventTarget {
   update(delta) {
     try {
       for (let controller of this.controllers) {
-        controller.updateFromGamepad();
+        if (controller != null) {
+          controller.updateFromGamepad();
+        }
       }
+      this.updateXRInteractions();
     } catch (e) {
       console.error(e);
     }
   }
 
+  updateXRInteractions() {
+    for (let i = 0; i < 2; i++) {
+      const ctrl = this.controllerStates[i];
+      if (!ctrl.controller) continue;
+      const intersection = this.getIntersection(i);
+      this.updateHover(ctrl, intersection);
+      this.updateLaser(ctrl, intersection);
+    }
+  }
 
-  /**
+  updateHover(ctrl, intersection) {
+    const now = Date.now();
+    let newHovered = null;
+    if (intersection.interactiveObj) {
+      newHovered = intersection.interactiveObj;
+      ctrl.lastIntersectionTime = now;
+    }
+    // Hover changed?
+    if (newHovered !== ctrl.currentHoveredObject) {
+      if (ctrl.currentHoveredObject && ctrl.currentHoveredObject.userData.onPointerOut) {
+        ctrl.currentHoveredObject.userData.onPointerOut(intersection);
+      }
+      if (newHovered && newHovered.userData && newHovered.userData.onPointerOver) {
+        newHovered.userData.onPointerOver(intersection);
+      }
+      ctrl.currentHoveredObject = newHovered;
+    }
+  }
+
+  updateLaser(ctrl, intersection) {
+    for (let child of ctrl.controller.children) {
+      if (child instanceof Line) {
+        if (intersection.result) {
+          child.visible = true;
+          // Extend laser to hit point
+          const hitDistance = intersection.result.distance;
+          child.scale.set(1, 1, hitDistance);
+        } else {
+          child.visible = false;
+          child.scale.set(1, 1, 2);   // default length when visible
+        }
+      }
+    }
+  }
+
+  /*
+   * Initialize a laser line for a controller
+   */
+  buildLaserLine() {
+    const laserMaterial = new LineBasicMaterial({ 
+      color: 0x10faef, 
+      transparent: true, 
+      opacity: 0.7 
+    });
+    const laserPoints = [new Vector3(0, 0, -0.05), new Vector3(0, 0, -1)];
+    const laserGeometry = new BufferGeometry().setFromPoints(laserPoints);
+    let laserLine = new Line(laserGeometry, laserMaterial);
+    laserLine.visible = false;
+    return laserLine;
+  }
+
+  /*
+   * onSelectStart event handler
+   */
+  onSelectStart(i, e) {
+    const ctrl = this.controllerStates[i];
+    if (ctrl.controller == null) return;
+
+    const intersection = this.getIntersection(i);
+
+    if (intersection.interactiveObj) {
+      if (ctrl.pressedObject != intersection.interactiveObj) {
+        ctrl.pressedObject = intersection.interactiveObj;
+        ctrl.pressStartTime = Date.now();
+        ctrl.lastIntersectionTime = Date.now();
+
+        // Optional immediate feedback
+        if (ctrl.pressedObject.userData.onPress) {
+          ctrl.pressedObject.userData.onPress(intersection);
+        }
+      }
+    }
+  }
+
+  /*
+   * onSelectEnd event handler
+   */
+  onSelectEnd(i, e) {
+    const ctrl = this.controllerStates[i];
+    if (!ctrl.pressedObject) return;
+
+    const timeHeld = Date.now() - ctrl.pressStartTime;
+    if (timeHeld > WebXRManager.MAX_CLICK_DURATION) {
+      ctrl.pressedObject = null;
+      return;
+    }
+
+    const intersection = this.getIntersection(i);
+
+    const stillPointingAtSameObject =
+      intersection.interactiveObj &&
+      intersection.interactiveObj == ctrl.pressedObject;
+
+    // Click detection
+    if (
+      stillPointingAtSameObject || 
+      (Date.now() - ctrl.lastIntersectionTime) < INTERSECTION_TOLERANCE)
+    {
+      if (ctrl.pressedObject.userData.onClick) {
+        ctrl.pressedObject.userData.onClick(intersection);
+      }
+    }
+
+    ctrl.pressedObject = null;
+  }
+
+  /*
+   * Raycast from a specific controller
+   */
+  getIntersection(i) {
+    const ctrl = this.controllerStates[i];
+    const controller = ctrl.controller;
+    if (!controller) {
+      return {
+        idxController: i,
+        result: null, 
+        interactiveObj: null
+      };
+    }
+
+    this.tempMatrix.identity().extractRotation(controller.matrixWorld);
+    this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
+    const intersects = this.raycaster.intersectObjects(this.selectableObjects, true);
+    
+    let intersect = intersects.length > 0 ? intersects[0] : null;
+    let interactiveObj = null;
+    
+    if (intersect != null)  {
+      interactiveObj = intersect.object;
+      while (interactiveObj && !interactiveObj.userData.isInteractive) {
+        interactiveObj = interactiveObj.parent;
+      }
+      if (interactiveObj && !interactiveObj.userData.isInteractive) {
+        interactiveObj = null;
+      }    
+    }
+
+    return {
+      idxController: i,
+      result: intersect, 
+      interactiveObj: interactiveObj
+    };
+  }
+
+  /*
+   * Clear the controllers array
+   */
+  clearControllers() {
+    try {
+      for (let i = 0; i < 2; ++i) {
+        const controller = this.controllerStates[i];
+        controller.removeEventListener('selectstart', (e) => this.onSelectStart(i, e).bind(this));
+        controller.removeEventListener('selectend', (e) => this.onSelectEnd(i, e).bind(this));
+      }
+    } catch (e) {}
+
+    this.controllers = [null, null];
+    
+    this.controllerStates = [{ 
+      controller: null,
+      pressedObject: null,
+      pressStartTime: 0,
+      lastIntersectionTime: 0,
+      currentHoveredObject: null
+    }, {
+      controller: null,
+      pressedObject: null,
+      pressStartTime: 0,
+      lastIntersectionTime: 0,
+      currentHoveredObject: null
+    }];
+  }
+
+  /*
    * Clear the WebXRManager object
    */
   dispose() {
     for (let i = 0; i < 2; ++i) {
-      const controller = this.world3d.renderer.xr.getControllerGrip(i);
-      if (controller == null) continue;
-      controller.removeEventListener('connected', this.onInputSourcesChange.bind(this));
-      controller.removeEventListener('disconnected', this.onInputSourcesChange.bind(this));
+      const controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+      if (controllerGrip == null) continue;
+      controllerGrip.removeEventListener('connected', this.onInputSourcesChange.bind(this));
+      controllerGrip.removeEventListener('disconnected', this.onInputSourcesChange.bind(this));
     }
 
+    this.clearControllers();
+
     this.controllers = null;
+    this.controllerStates = null;
+    this.selectableObjects = null;
     this.loader = null;
     this.world3d = null;
     this.session = null;

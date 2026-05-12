@@ -11,6 +11,7 @@ Redirect 301 /build https://thesecondrealm.is/index.html?p=configurator
 Redirect 301 /credits https://thesecondrealm.is/index.html?p=credits
 Redirect 301 /explore https://thesecondrealm.is/index.html?p=explore
 Redirect 301 /home https://thesecondrealm.is/index.html?p=home
+Redirect 301 /kiosk https://thesecondrealm.is/index.html?p=kiosk
 Redirect 301 /shape https://thesecondrealm.is/index.html?p=shape
 Redirect 301 /tell https://thesecondrealm.is/index.html?p=tell
 
