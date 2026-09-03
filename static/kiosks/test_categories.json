@@ -1,8 +1,10 @@
 {
   "version": "0.1.0",
-  "title": "THE SECOND REALM ATLAS",
-  "text_intro": "Test of a kiosk page with named collections",
-  "visual": "/static/images/tsr_11.jpg",
+  "show_introduction_page": true,
+  "show_navigation_page": true,
+  "title": "SELECT A REALM TO EXPLORE",
+  "text_intro": "",
+  "visual": "/static/images/tsr_1b.jpg",
   "collections": [{
     "title": "DEMOS",
     "desc": "Demos of Guided Tours, Automated Guided Tours, Automated Wanderings, Timelapse mode.",

@@ -643,26 +643,84 @@ li {
  * ATLAS & KIOSK
  */
 
-#atlas-section2 {
-  margin-bottom: 10em;
-}
-
-#kiosk-section2 {
-  padding-bottom: 2em;
-}
-
 #atlas-section1 {
   background-image: url(/static/images/tsr_11.jpg);
-}
-
-#atlas-section1,
-#kiosk-section1 {
   text-align: left;
   justify-content: end !important;
 }
 
-#kiosk-section2 .level1 .title {
-  margin: 4em 0 1em 0;
+#kiosk-section1 {
+  background-image: url(/static/images/tsr_9.jpg);
+  justify-content: end !important;
+  text-align: right;
+}
+
+#kiosk-section1 #enter-tsr-btn {
+  font-size: 14pt;
+  margin-top: 2em;
+}
+
+#atlas-section2 {
+  margin-bottom: 10em;
+}
+
+#kiosk-section4 {
+  padding-bottom: 2em;
+}
+
+#kiosk-section2 .title {
+  margin-left: 10%;
+  font-size: 24pt;
+  font-weight: 300;
+}
+
+#kiosk-section2 .subtitle {
+  margin-left: 10%;
+  font-size: 13pt;
+  font-weight: 500;
+}
+
+#kiosk-section2 .content {
+  text-align: left;
+  margin-left: 10%;
+  margin-right: 50%;
+  font-size: 13pt;
+  font-weight: 300;
+}
+
+#kiosk-section2 #actions-div,
+#kiosk-section3 #actions2-div {
+  margin-top: 3em!important;
+  margin-left: 20%;
+}
+
+#kiosk-section2 #prev-btn,
+#kiosk-section2 #next-btn,
+#kiosk-section3 #prev2-btn,
+#kiosk-section3 #next2-btn {
+  font-size: 14pt;
+  margin: 0 1em 0 1em;
+}
+
+#kiosk-section3 #controller-use-img {
+  margin-top: 9em;
+  width: 60%;
+  opacity: 0.8;
+}
+
+
+#kiosk-section4 .cover-left {
+  width: 100%;
+  margin: 5% 50% 0% 10%;
+}
+
+#kiosk-section4 .level1 {
+  margin: 0 10% 0 10%;
+}
+
+#kiosk-section4 .level1 .title {
+  margin: 1em 0 1em 0;
+  text-align: left;
 }
 
 .row {
@@ -1181,21 +1239,21 @@ li {
   */
 
   #atlas-section2,
-  #kiosk-section2 {
+  #kiosk-section4 {
     margin-bottom: 6em;
   }
 
   #atlas-section1,
   #atlas-section2,
   #kiosk-section1,
-  #kiosk-section2 {
+  #kiosk-section4 {
     padding-left: 1.25em;
     padding-right: 1.25em;
     box-sizing: border-box;
   }
 
   #atlas-section1,
-  #kiosk-section1 {
+  #kiosk-section4 {
     justify-content: center !important;
     align-items: center;
     text-align: center;
@@ -1203,11 +1261,16 @@ li {
     padding-bottom: 4em;
   }
 
-  #atlas-section1 .cover-left,
-  #kiosk-section1 .cover-left {
+  #atlas-section1 .cover-left {
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
+  }
+
+  #kiosk-section4 .cover-left {
+    width: 100%;
+    max-width: 320px;
+    margin: 5% 50% 0% 11%;
   }
 
   #atlas-section1 .title,
@@ -1216,29 +1279,29 @@ li {
   }
 
   #atlas-section1 .title,
-  #kiosk-section1 .title {
+  #kiosk-section4 .title {
     font-size: 20pt;
     margin-bottom: 0.8em;
   }
 
   #atlas-section1 .content,
-  #kiosk-section1 .content {
+  #kiosk-section4 .content {
     font-size: 11pt;
     line-height: 1.7;
   }
 
   #atlas-section2,
-  #kiosk-section2 {
+  #kiosk-section4 {
     padding-top: 3.5em;
     padding-bottom: 4em;
   }
 
-  #kiosk-section2 .level1 .note {
+  #kiosk-section4 .level1 .note {
     margin: 0 0 3em 0;
   }
 
   #atlas-section2 .row,
-  #kiosk-section2 .row {
+  #kiosk-section4 .row {
     width: 100%;
     max-width: 320px;
     display: flex;
@@ -1250,19 +1313,19 @@ li {
   }
 
   #atlas-section2 .row:not(:last-child),
-  #kiosk-section2 .row:not(:last-child) {
+  #kiosk-section4 .row:not(:last-child) {
     margin-bottom: 2.86em;
   }
 
   #atlas-section2 .card,
-  #kiosk-section2 .card {
+  #kiosk-section4 .card {
     width: 100%;
     height: auto;
     min-height: 0;
   }
 
   #atlas-section2 .visual,
-  #kiosk-section2 .visual {
+  #kiosk-section4 .visual {
     min-height: 100px;
     height: 110px;
     padding: 0.75em;
@@ -1272,14 +1335,14 @@ li {
   }
 
   #atlas-section2 .visual a,
-  #kiosk-section2 .visual a {
+  #kiosk-section4 .visual a {
     display: block;
     width: 100%;
     text-align: center;
   }
 
   #atlas-section2 .desc,
-  #kiosk-section2 .desc {
+  #kiosk-section4 .desc {
     padding: 1.2em;
     font-size: 10pt;
     line-height: 1.6;

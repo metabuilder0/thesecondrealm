@@ -1,13 +1,110 @@
-<section id="kiosk-section1" 
-         class="parallax-right-container">
-  
-  <div class="cover-left">
-    <h1 class="title left" id="title-h1"></h1>
-    <p class="content left" id="desc-p"></p>
-  </div>
+<!-- SECTION 1 - HOME PAGE -->
+<div id="kiosk-div1" hidden>
+  <section id="kiosk-section1" 
+           class="parallax-left-container">
+    
+    <div class="cover-right home-cover-right">
+      <h1 class="title home-logo-title">
+        <img src="/static/images/tsr-logo.svg" alt="The Second Realm" />
+      </h1>
+    
+      <blockquote class="content home-logo-quote">
+        <p>"We can gain a new territory of freedom for several years."</p>
+        <br />
+        <span class="bold">— Satoshi Nakamoto</span>
+      </blockquote>
 
-</section>
+      <!-- ACTIONS -->
+      <button id="enter-tsr-btn" class="btn-success">ENTER THE SECOND REALM</button>
+    </div>
 
-<section id="kiosk-section2" class="buffer"></section>
+  </section>
+</div>
+
+<!-- SECTION 2 - INTRODUCTION -->
+<div id="kiosk-div2" hidden>
+  <section id="kiosk-section2" 
+           class="parallax-right-container">
+    
+      <h1 class="title">WHAT IS THE SECOND REALM?</h1>
+      <p class="content">Bitcoin isn't just code, it's a territory.</p>
+      <p class="content">For most people, the Bitcoin blockchain is merely a synonym for boring financial transactions and abstract strings of characters that might make you rich someday.</p>
+      <p class="content">But this grim vision is far from inevitable. Behind the curtain lies another world.</p>
+      <p class="content">The Second Realm is designed to make the structure of Bitcoin data more visible to aynone. Inside each Realm, the blockchain appears as a points cloud. Each point is a block. Each axis of the world is assigned to a Bitcoin metric: block height, transactions count, block size, etc.</p>
+      <p class="content">And from that data, landscapes emerge.</p>
+
+      <!-- ACTIONS -->
+      <div id="actions-div">
+        <button id="prev-btn" class="btn-success">PREV.</button>
+        <button id="next-btn" class="btn-success">NEXT</button>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<!-- SECTION 3 - NAVIGATION -->
+<div id="kiosk-div3" hidden>
+  <section id="kiosk-section3" 
+           class="parallax-right-container">
+
+    <div id="controller-use-div" class="paragraph-row">
+      <div id="controller-use-content-div" class="paragraph-left">
+        <h1 class="title">HOW TO PILOT THE DATASHIP</h1>
+
+        <p class="subtitle bold">Buttons</p>
+
+        <p class="content">
+          <ul>
+            <li><span class="underline">Trigger button:</span> Horizontal translation (forward)</li>
+            <li><span class="underline">Button B/Y:</span> Increase the speed mode</li>
+            <li><span class="underline">Button A/X:</span> Decrease the speed mode</li>
+            <li><span class="underline">Meta Button (long press):</span> Recenter the camera</li>
+          </ul>
+        </p>
+        
+        <p class="content">&nbsp;</p>
+        
+        <p class="subtitle bold">Thumbstick</p>
+
+        <p class="content">
+          <ul>
+            <li><span class="underline">Up:</span> Vertical Translation (up)</li>
+            <li><span class="underline">Down:</span> Vertical Translation (down)</li>
+            <li><span class="underline">Left:</span> Rotation Left (Anticlockwise rotation around vertical axis)</li>
+            <li><span class="underline">Right:</span> Rotation Right (Clockwise rotation around vertical axis)</li>
+          </ul>
+        </p>
+
+        <p class="content">&nbsp;</p>
+        
+        <!-- ACTIONS -->
+        <div id="actions2-div">
+          <button id="prev2-btn" class="btn-success">PREV.</button>
+          <button id="next2-btn" class="btn-success">NEXT</button>
+        </div>
+
+      </div>
+
+      <div id="controller-use-img-div" class="paragraph-right">
+        <img id="controller-use-img" src="/static/images/vr-controller-schema3.png"/>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+
+<!-- SECTION 4 - ATLAS -->
+<div id="kiosk-div4" hidden>
+  <section id="kiosk-section4" 
+           class="parallax-right-container">
+    <div class="cover-left">
+      <h1 class="title left" id="title-h1"></h1>
+      <p class="content left" id="desc-p"></p>
+    </div>
+  </section>
+</div>
+
 
 <script data-include-js="/pages/kiosk/kiosk.js"></script>
