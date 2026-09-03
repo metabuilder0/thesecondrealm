@@ -89,6 +89,10 @@ const kioskScript = {
   preparePage: async () => {
     // Sets app mode to kiosk
     sessionStorage.setItem('appMode', APP_MODE_KIOSK);
+    // Sets the flag indicating if user has visited their first realm
+    if (!sessionStorage.getItem('hasVisitedFirstRealm')) {
+      sessionStorage.setItem('hasVisitedFirstRealm', false);
+    }
     // Uses default kiosk if no kiosk defined
     if (!sessionStorage.getItem('urlKiosk')) {
       sessionStorage.setItem('urlKiosk', '/static/kiosks/default.json');
@@ -128,9 +132,13 @@ const kioskScript = {
     kioskScript.clearInactivityTimeout();
     // Sets the inactivity timeout
     if (section != '#kiosk-div1') {
-      kioskScript._timeoutId = setTimeout(() => {
-        kioskScript.goToSection('#kiosk-div1');
-      }, 60000);
+      if (sessionStorage.getItem('hasVisitedFirstRealm') == 'true') {
+        kioskScript._timeoutId = setTimeout(() => {
+          kioskScript.goToSection('#kiosk-div1');
+        }, 60000);
+      }
+    } else {
+      sessionStorage.setItem('hasVisitedFirstRealm', false);
     }
   },
 
@@ -260,6 +268,7 @@ const kioskScript = {
     
     const hlink = document.createElement('a');
     hlink.addEventListener('click', () => {
+      sessionStorage.setItem('hasVisitedFirstRealm', true);
       kioskScript.clearInactivityTimeout();
     });
     hlink.setAttribute('href', url);
