@@ -1,4 +1,5 @@
 .cache/
+.vscode/
 js/libs/@webxr-input-profiles/assets/dist/profiles/
 static/data/
 static/images/
