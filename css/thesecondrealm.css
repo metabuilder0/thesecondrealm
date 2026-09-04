@@ -744,6 +744,11 @@ li {
   text-align: left;
 }
 
+#kiosk-section4 .card,
+#atlas-section2 .card[data-href] {
+  cursor: pointer;
+}
+
 .placeholder {
   background-color: #000000;
 }
@@ -1332,13 +1337,6 @@ li {
     box-sizing: border-box;
     font-size: 11pt;
     line-height: 1.4;
-  }
-
-  #atlas-section2 .visual a,
-  #kiosk-section4 .visual a {
-    display: block;
-    width: 100%;
-    text-align: center;
   }
 
   #atlas-section2 .desc,

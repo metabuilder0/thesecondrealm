@@ -1,7 +1,12 @@
 const atlasScript = {
 
   initPage: () => {
-    //
+    // Sets the event handlers
+    document.querySelectorAll('#atlas-section2 .card[data-href]').forEach((card) => {
+      card.addEventListener('click', () => {
+        window.location.href = card.getAttribute('data-href');
+      });
+    });
   },
 
   preparePage: () => {

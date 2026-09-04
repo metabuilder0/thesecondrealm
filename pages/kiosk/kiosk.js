@@ -261,19 +261,16 @@ const kioskScript = {
   createCard: (name, desc, url, visual) => {
     const cardDiv = document.createElement('div');
     cardDiv.setAttribute('class', 'card');
+    cardDiv.addEventListener('click', () => {
+      sessionStorage.setItem('hasVisitedFirstRealm', true);
+      kioskScript.clearInactivityTimeout();
+      window.location.href = url;
+    });
 
     const visualDiv = document.createElement('div');
     visualDiv.setAttribute('class', 'visual');
     visualDiv.style.backgroundImage = `url(${visual})`;
-    
-    const hlink = document.createElement('a');
-    hlink.addEventListener('click', () => {
-      sessionStorage.setItem('hasVisitedFirstRealm', true);
-      kioskScript.clearInactivityTimeout();
-    });
-    hlink.setAttribute('href', url);
-    hlink.innerHTML = name;
-    visualDiv.appendChild(hlink);
+    visualDiv.innerHTML = name;
     
     const descDiv = document.createElement('div');
     descDiv.setAttribute('class', 'desc');
