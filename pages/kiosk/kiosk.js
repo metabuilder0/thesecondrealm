@@ -61,12 +61,12 @@ const kioskScript = {
       }
     );
     
-    document.querySelector('#prev-btn').addEventListener(
-      'click', (e) => {
-        e.preventDefault();
-        kioskScript.goToSection('#kiosk-div1');
-      }
-    );
+    // document.querySelector('#prev-btn').addEventListener(
+    //   'click', (e) => {
+    //     e.preventDefault();
+    //     kioskScript.goToSection('#kiosk-div1');
+    //   }
+    // );
     
     document.querySelector('#next2-btn').addEventListener(
       'click', (e) => {
