@@ -28,7 +28,8 @@ class HUDRightScreen extends ThreeMeshUI.Block {
    */
 
   world3d = null;
-
+  hud = null;
+  
   #speed = null;
   #speedUnit = null;
   #speedRefreshCumulWait = 0;
@@ -43,7 +44,7 @@ class HUDRightScreen extends ThreeMeshUI.Block {
   /*
    * Constuctor
    */
-  constructor(world3d, width, height) {
+  constructor(world3d, hud, width, height) {
     super({
       ref: 'container',
       padding: 0.02,
@@ -62,6 +63,7 @@ class HUDRightScreen extends ThreeMeshUI.Block {
     });
     
     this.world3d = world3d;
+    this.hud = hud;
     this.#series = data.initializeSeriesList();
 
     this.buildScreen(width, height);
@@ -317,6 +319,7 @@ class HUDRightScreen extends ThreeMeshUI.Block {
   dispose() {
     // Resets the references to others objects
     this.world3d = null;
+    this.hud = null;
     this.#speed = null;
     this.#speedUnit = null;
     this.#speedModes = [];

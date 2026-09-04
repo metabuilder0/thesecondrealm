@@ -14,8 +14,21 @@ import {
 
 class Compass extends Group {
 
-  constructor() {
+  /**
+   * Attributes
+   */
+  world3d = null;
+  hud = null;
+
+  /**
+   * Constructor
+   * @param {*} world3d 
+   * @param {*} hud 
+   */
+  constructor(world3d, hud) {
     super();
+    this.world3d = world3d;
+    this.hud = hud;
     this.build();
   }
 
@@ -126,6 +139,9 @@ class Compass extends Group {
    * Dispose the compass 
    */
   dispose() {    
+    // Resets the references to others objects
+    this.world3d = null;
+    this.hud = null;
   }
 
 }
