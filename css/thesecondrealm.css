@@ -688,6 +688,18 @@ li {
   font-weight: 300;
 }
 
+#kiosk-section3 .content {
+  text-align: left;
+  font-size: 11pt;
+  font-weight: 300;
+}
+
+#kiosk-section3 ul {
+  margin-left: 2em;
+  font-size: 11pt;
+  font-weight: 300;
+}
+
 #kiosk-section2 #actions-div,
 #kiosk-section3 #actions2-div {
   margin-top: 3em!important;
