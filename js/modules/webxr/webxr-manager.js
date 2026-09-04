@@ -122,6 +122,7 @@ class WebXRManager extends EventTarget {
    * onSessionStarted event handler
    */
   async onSessionStarted(session) {
+    session.addEventListener('visibilitychange', this.onVisibilityChanged.bind(this));
     session.addEventListener('end', this.onSessionEnded.bind(this));
     this.session = session;
     this.isActive = true;
@@ -134,9 +135,22 @@ class WebXRManager extends EventTarget {
   onSessionEnded( /*event*/ ) {
     this.isActive = false;
     this.session.removeEventListener('end', this.onSessionEnded);
+    this.session.removeEventListener('visibilitychange', this.onVisibilityChanged);
     this.session = null;
     this.dispose();
     this.dispatchEvent(new Event('sessionend'));
+  }
+
+  /**
+   * onVisibilityChanged event handler
+   * @param {*} object 
+   * @param {*} callbacks 
+   */
+  onVisibilityChanged( /*event*/ ) {
+    if (this.session.visibilityState == 'hidden') {
+      this.dispatchEvent(new Event('userleft'));
+      this.session.end();
+    } 
   }
 
   /*
