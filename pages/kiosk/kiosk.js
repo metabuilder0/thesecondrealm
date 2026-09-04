@@ -24,15 +24,19 @@ const kioskScript = {
   // Flag indicating if section 3 should be displayed
   _showNavigationSection: false,
 
-  // Timer id
-  _timeoutId: null,
-
 
   /**
    * Init the page
    */
   initPage: () => {
     // Sets the event handlers
+    document.addEventListener(
+      'visibilitychange', () => {
+      if (document.hidden) {
+        kioskScript.onUserLeft();
+      }
+    });
+
     document.querySelector('#enter-tsr-btn').addEventListener(
       'click', (e) => {
         e.preventDefault();
@@ -128,28 +132,13 @@ const kioskScript = {
   goToSection: (section) => {
     sessionStorage.setItem('sectionKiosk', section);
     kioskScript.setSectionsVisibility();
-    // Clears the timeout
-    kioskScript.clearInactivityTimeout();
-    // Sets the inactivity timeout
-    if (section != '#kiosk-div1') {
-      if (sessionStorage.getItem('hasVisitedFirstRealm') == 'true') {
-        kioskScript._timeoutId = setTimeout(() => {
-          kioskScript.goToSection('#kiosk-div1');
-        }, 60000);
-      }
-    } else {
-      sessionStorage.setItem('hasVisitedFirstRealm', false);
-    }
   },
 
   /**
-   * Clear inactivity timeout
+   * onUserLeft event handler
    */
-  clearInactivityTimeout: () => {
-    if (kioskScript._timeoutId != null) {
-      clearTimeout(kioskScript._timeoutId);
-      kioskScript._timeoutId = null;
-    }
+  onUserLeft: () => {
+    kioskScript.goToSection('#kiosk-div1');
   },
 
   /**
@@ -262,8 +251,6 @@ const kioskScript = {
     const cardDiv = document.createElement('div');
     cardDiv.setAttribute('class', 'card');
     cardDiv.addEventListener('click', () => {
-      sessionStorage.setItem('hasVisitedFirstRealm', true);
-      kioskScript.clearInactivityTimeout();
       window.location.href = url;
     });
 
