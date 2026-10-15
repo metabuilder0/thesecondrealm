@@ -30,12 +30,7 @@ const kioskScript = {
    */
   initPage: () => {
     // Sets the event handlers
-    document.addEventListener(
-      'visibilitychange', () => {
-      if (document.hidden) {
-        kioskScript.onUserLeft();
-      }
-    });
+    document.addEventListener('visibilitychange', kioskScript.onvisibilitychange);
 
     document.querySelector('#enter-tsr-btn').addEventListener(
       'click', (e) => {
@@ -135,6 +130,15 @@ const kioskScript = {
    */
   onUserLeft: () => {
     kioskScript.goToSection('#kiosk-div1');
+  },
+
+  /**
+   * onvisibilitychange event handler
+   */
+  onvisibilitychange: () => {
+    if (document.hidden) {
+      kioskScript.onUserLeft();
+    }
   },
 
   /**
@@ -247,6 +251,7 @@ const kioskScript = {
     const cardDiv = document.createElement('div');
     cardDiv.setAttribute('class', 'card');
     cardDiv.addEventListener('click', () => {
+      document.removeEventListener('visibilitychange', kioskScript.onvisibilitychange);
       window.location.href = url;
     });
 
