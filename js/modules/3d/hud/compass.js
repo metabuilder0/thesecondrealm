@@ -11,6 +11,8 @@ import {
   LineBasicMaterial
 } from 'three';
 
+import ThreeMeshUI from '../../../libs/three-mesh-ui/three-mesh-ui.module.min.js';
+
 
 class Compass extends Group {
 
@@ -19,6 +21,7 @@ class Compass extends Group {
    */
   world3d = null;
   hud = null;
+  axisLabels = [];
 
   /**
    * Constructor
@@ -88,12 +91,61 @@ class Compass extends Group {
     });
     this.crosshair = new Line(geometry3, material3);
     this.add(this.crosshair);
+    this.buildAxisLabels();
     // Builds the sphere
     const geometry4 = new SphereGeometry(0.022, 64, 32); 
     let material4 = new MeshBasicMaterial({color: 0xffffff, opacity: 0.06, depthWrite: false});
     material4.transparent = true;
     const sphere = new Mesh(geometry4, material4);
     this.add(sphere);
+  }
+
+  /*
+   * Labels sitting on the positive tips of the crosshair axes.
+   * They are parented to the crosshair so their position tracks the world
+   * axes, then counter-rotated so they keep facing the camera.
+   */
+  buildAxisLabels() {
+    const labelDistance = 0.032;
+    const definitions = [
+      { content: 'X', position: new Vector3(labelDistance, 0, 0) },
+      { content: 'Y', position: new Vector3(0, labelDistance, 0) },
+      { content: 'Z', position: new Vector3(0, 0, labelDistance) }
+    ];
+    const fontColor = new Color(0xafafaf);
+
+    for (let i = 0; i < definitions.length; i++) {
+      const definition = definitions[i];
+      const label = new ThreeMeshUI.Block({
+        width: 0.02,
+        height: 0.02,
+        padding: 0,
+        margin: 0,
+        offset: 0,
+        interLine: 0,
+        borderRadius: 0,
+        borderWidth: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+        textAlign: 'center',
+        backgroundOpacity: 0,
+        fontFamily: 'js/libs/three-mesh-ui/assets/Roboto-msdf.json',
+        fontTexture: 'js/libs/three-mesh-ui/assets/Roboto-msdf.png',
+        fontColor: fontColor
+      });
+      label.add(new ThreeMeshUI.Text({
+        content: definition.content,
+        fontSize: 0.006,
+        offset: 0
+      }));
+      label.position.copy(definition.position);
+      label.frame.visible = false;
+      label.frame.castShadow = false;
+      label.frame.receiveShadow = false;
+      label.frame.material.depthWrite = false;
+      this.crosshair.add(label);
+      this.axisLabels.push(label);
+    }
   }
 
   /*
@@ -105,6 +157,12 @@ class Compass extends Group {
     q.normalize();
     q.invert();
     this.crosshair.setRotationFromQuaternion(q);
+    // q is the inverse of the view orientation. Inverting it again aligns
+    // each label with the camera while leaving its position on the axis.
+    q.invert();
+    for (let i = 0; i < this.axisLabels.length; i++) {
+      this.axisLabels[i].quaternion.copy(q);
+    }
 
     const origin = new Vector3();
     this.getWorldPosition(origin);
@@ -142,6 +200,7 @@ class Compass extends Group {
     // Resets the references to others objects
     this.world3d = null;
     this.hud = null;
+    this.axisLabels = [];
   }
 
 }

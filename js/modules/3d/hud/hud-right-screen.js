@@ -273,9 +273,11 @@ class HUDRightScreen extends ThreeMeshUI.Block {
     if (this.#positionRefreshCumulWait > 0.3) {
       const cloudData = this.world3d.pointsCloud.cloudData;
       // Displays axis labels
+      const axisLabelsNames = ['X', 'Y', 'Z'];
       for (let i=0; i < 3; i++) {
         const label = this.#series[cloudData.seriesNames[i]]['label'];
-        this.#axisLabels[i].set({content: label});
+        const axis = axisLabelsNames[i];
+        this.#axisLabels[i].set({content: `${axis}  :  ${label}`});
       }
       // Displays coordinates
       const pos = this.world3d.camera.parent.position;
