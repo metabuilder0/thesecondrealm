@@ -93,10 +93,6 @@ const kioskScript = {
   preparePage: async () => {
     // Sets app mode to kiosk
     sessionStorage.setItem('appMode', APP_MODE_KIOSK);
-    // Sets the flag indicating if user has visited their first realm
-    if (!sessionStorage.getItem('hasVisitedFirstRealm')) {
-      sessionStorage.setItem('hasVisitedFirstRealm', false);
-    }
     // Uses default kiosk if no kiosk defined
     if (!sessionStorage.getItem('urlKiosk')) {
       sessionStorage.setItem('urlKiosk', '/static/kiosks/default.json');
