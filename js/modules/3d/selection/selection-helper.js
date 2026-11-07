@@ -17,7 +17,6 @@ class SelectionHelper extends LineSegments {
    */
 
   world3d = null;
-  controllers = [];
   pickedBlock = null;
   isActive = false;
 
@@ -48,14 +47,6 @@ class SelectionHelper extends LineSegments {
       { type: 'module' }
     ); 
     this.#worker.onmessage = this.processResultRaycasting.bind(this);
-
-    // Initializes the controller objects
-    for (let i = 0; i < 2; ++i) {
-      const controller = this.world3d.renderer.xr.getController(i);
-      if (controller == null) continue;
-      this.world3d.camera.parent.add(controller);
-      this.controllers.push(controller);
-    }
   }
 
   /**
@@ -65,7 +56,9 @@ class SelectionHelper extends LineSegments {
     if (this.world3d.immersionModeActivated) {
       this.#refreshCumulWait += delta;
       if (this.#refreshCumulWait > 0.1) {
-        for (let controller of this.controllers) {
+        for (let i = 0; i < 2; ++i) {
+          const controller = this.world3d.renderer.xr.getController(i);
+          if (controller == null) continue;
           const array = controller.matrixWorld.toArray();
           this.#worker.postMessage([1, array, delta]);
         }

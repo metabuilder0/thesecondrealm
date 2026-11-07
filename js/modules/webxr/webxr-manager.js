@@ -5,6 +5,15 @@ import {
   MotionController 
 } from '/js/libs/@webxr-input-profiles/motion-controllers.module.js';
 
+import {
+  BufferGeometry,
+  Line,
+  LineBasicMaterial,
+  Matrix4,
+  Raycaster,
+  Vector3
+} from 'three';
+
 
 class WebXRManager extends EventTarget {
 
@@ -29,6 +38,9 @@ class WebXRManager extends EventTarget {
 
   static ASSETS_URI = '/static/webxr/profiles'
 
+  static MAX_CLICK_DURATION = 800;
+  static INTERSECTION_TOLERANCE = 120;
+
 
   /*
    * Attributes
@@ -37,10 +49,29 @@ class WebXRManager extends EventTarget {
   world3d = null;
   session = null;
   loader = null;
-
   controllers = [];
-  controllerInputSources = [];
-  controllerModels = [];
+  isActive = false;
+
+  raycaster = new Raycaster();
+  tempMatrix = new Matrix4();
+
+  // Interactive objects 
+  selectableObjects = [];
+  
+  // Controllers states
+  controllerStates = [{ 
+    controller: null,
+    pressedObject: null,
+    pressStartTime: 0,
+    lastIntersectionTime: 0,
+    currentHoveredObject: null
+  }, {
+    controller: null,
+    pressedObject: null,
+    pressStartTime: 0,
+    lastIntersectionTime: 0,
+    currentHoveredObject: null
+  }];
 
   // Hack (required for some browsers) 
   #xrSessionIsGranted = false;
@@ -55,6 +86,20 @@ class WebXRManager extends EventTarget {
     this.world3d = world3d;
     this.loader = new GLTFLoader();
 
+    // Initializes the controller and controller grip objects
+    for (let i = 0; i < 2; ++i) {
+      const controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+      if (controllerGrip == null) continue;
+      controllerGrip.addEventListener('connected', this.onInputSourcesChange.bind(this));
+      controllerGrip.addEventListener('disconnected', this.onInputSourcesChange.bind(this));
+      this.world3d.camera.parent.add(controllerGrip);
+
+      const controller = this.world3d.renderer.xr.getController(i);
+      if (controller == null) continue;
+      this.world3d.camera.parent.add(controller);
+    }
+
+    // Offer webxr session if it's supported by the browser
     if (typeof navigator !== 'undefined' && 'xr' in navigator) {
 			// WebXRViewer (based on Firefox) has a bug where addEventListener
 			// throws a silent exception and aborts execution entirely.
@@ -77,9 +122,10 @@ class WebXRManager extends EventTarget {
    * onSessionStarted event handler
    */
   async onSessionStarted(session) {
+    session.addEventListener('visibilitychange', this.onVisibilityChanged.bind(this));
     session.addEventListener('end', this.onSessionEnded.bind(this));
-    session.addEventListener('inputsourceschange', this.onInputSourcesChange.bind(this));
     this.session = session;
+    this.isActive = true;
     this.dispatchEvent(new Event('sessionstart'));
   }
 
@@ -87,70 +133,89 @@ class WebXRManager extends EventTarget {
    * onSessionEnded event handler
    */
   onSessionEnded( /*event*/ ) {
+    this.isActive = false;
     this.session.removeEventListener('end', this.onSessionEnded);
+    this.session.removeEventListener('visibilitychange', this.onVisibilityChanged);
     this.session = null;
     this.dispose();
     this.dispatchEvent(new Event('sessionend'));
+  }
+
+  /**
+   * onVisibilityChanged event handler
+   * @param {*} object 
+   * @param {*} callbacks 
+   */
+  onVisibilityChanged( /*event*/ ) {
+    if (this.session.visibilityState == 'hidden') {
+      this.dispatchEvent(new Event('userleft'));
+      this.session.end();
+    } 
+  }
+
+  /*
+   * Declare a 3D object as interactive
+   */
+  makeInteractive(object, callbacks = {}) {
+    object.userData = {
+      ...object.userData,
+      onClick: callbacks.onClick || null,
+      onPress: callbacks.onPress || null,
+      onPointerOver: callbacks.onPointerOver || null,
+      onPointerOut: callbacks.onPointerOut || null,
+      isInteractive: true,
+    };
+
+    if (!this.selectableObjects.includes(object)) {
+      this.selectableObjects.push(object);
+    }
   }
 
   /*
    * onInputSourcesChange event handler
    */
   async onInputSourcesChange(e) {
-    for (let i = 0; i < e.removed.length; i++) {
-      const inputSource = e.removed[i];
-      const index = this.controllerInputSources.indexOf(inputSource);
-      if (index >= 0) {
-        this.controllerInputSources[index] = null;
-        this.controllers[index] = null;
-        // this.controllerModels[index].dispose();
-        this.controllerModels[index] = null;
+    try {
+      if (!this.isActive) return;
+
+      this.clearControllers();
+
+      for (let i = 0; i < 2; i++) {
+        let inputSource = this.world3d.renderer.xr.getInputSource(i);
+        if (inputSource == null) continue;
+
+        let controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+
+        const ctrl = this.controllerStates[i];
+        ctrl.controller = this.world3d.renderer.xr.getController(i);
+        ctrl.controller.add(this.buildLaserLine());
+        ctrl.controller.addEventListener('selectstart', (e) => this.onSelectStart(i, e).bind(this));
+        ctrl.controller.addEventListener('selectend', (e) => this.onSelectEnd(i, e).bind(this));
+        
+        let {profile, assetPath} = await fetchProfile(inputSource, WebXRManager.ASSETS_URI);
+
+        // Forces use of meta quest touch plus model for now
+        let tokens = assetPath.split('/');
+        tokens[tokens.length - 2] = 'meta-quest-touch-plus';
+        assetPath = tokens.join('/');
+        const motionController = new MotionController(inputSource, profile, assetPath);
+
+        if (!this.loader) return;
+
+        await this.loader.load(motionController.assetUrl, (glb) => {
+          if (!this.isActive) return;
+          // Attaches the model to the controller grip
+          let controllerModel = glb.scene;
+          controllerGrip.clear();
+          controllerGrip.add(controllerModel);
+          // Adds motionController to the array of controllers
+          this.controllers[i] = motionController;
+        }, undefined, (error) => {
+          console.error(error);
+        });   
       }
-    }
-
-    // Checks that we still have an active xr session
-    if (!this.session) return;
-
-    for (let i = 0; i < e.added.length; i++) {
-      const inputSource = e.added[i];
-      let {profile, assetPath} = await fetchProfile(inputSource, WebXRManager.ASSETS_URI);
-      // Forces use of meta quest touch plus model for now
-      let tokens = assetPath.split('/');
-      tokens[tokens.length - 2] = 'meta-quest-touch-plus';
-      assetPath = tokens.join('/');
-      const motionController = new MotionController(inputSource, profile, assetPath);
-
-      let controllerIndex = -1;
-      await this.loader.load(motionController.assetUrl, (glb) => {
-        let controllerModel = glb.scene;
-        controllerModel.rotation.x = Math.PI / 4;
-        controllerIndex = this.controllerInputSources.indexOf(inputSource);
-        if (controllerIndex === - 1) {
-          // Assign input source a controller that currently has no input source
-          for (let j = 0; j < 2; j++) {
-            if (j >= this.controllerInputSources.length) {
-              this.controllerInputSources.push(inputSource);
-              this.controllers.push(motionController);
-              this.controllerModels.push(controllerModel);
-              this.world3d.renderer.xr.getController(j).add(controllerModel);
-              controllerIndex = j;
-              break;
-            } else if (this.controllerInputSources[j] === null) {
-              this.controllerInputSources[j] = inputSource;
-              this.controllers[j] = motionController;
-              this.controllerModels[j] = controllerModel;
-              this.world3d.renderer.xr.getController(j).add(controllerModel);
-              controllerIndex = j;
-              break;
-            }
-          }
-        }
-      }, undefined, (error) => {
-        console.error(error);
-      });
-
-      // // If all controllers do currently receive input we ignore new ones
-      // if (controllerIndex === - 1) break;
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -181,28 +246,233 @@ class WebXRManager extends EventTarget {
   }
 
   /*
+   * End the XR session
+   */
+  async endSession() {
+    if (this.session) {
+      await this.session.end();
+    }
+  }
+
+  /*
    * Animation loop
    */
   update(delta) {
-    Object.values(this.controllers).forEach(controller => {
-      if (controller != null) {
-        controller.updateFromGamepad();
+    try {
+      for (let controller of this.controllers) {
+        if (controller != null) {
+          controller.updateFromGamepad();
+        }
       }
-    });
+      this.updateXRInteractions();
+    } catch (e) {
+      console.error(e);
+    }
   }
 
+  updateXRInteractions() {
+    for (let i = 0; i < 2; i++) {
+      const ctrl = this.controllerStates[i];
+      if (!ctrl.controller) continue;
+      const intersection = this.getIntersection(i);
+      this.updateHover(ctrl, intersection);
+      this.updateLaser(ctrl, intersection);
+    }
+  }
 
-  /**
+  updateHover(ctrl, intersection) {
+    const now = Date.now();
+    let newHovered = null;
+    if (intersection.interactiveObj) {
+      newHovered = intersection.interactiveObj;
+      ctrl.lastIntersectionTime = now;
+    }
+    // Hover changed?
+    if (newHovered !== ctrl.currentHoveredObject) {
+      if (ctrl.currentHoveredObject && ctrl.currentHoveredObject.userData.onPointerOut) {
+        ctrl.currentHoveredObject.userData.onPointerOut(intersection);
+      }
+      if (newHovered && newHovered.userData && newHovered.userData.onPointerOver) {
+        newHovered.userData.onPointerOver(intersection);
+      }
+      ctrl.currentHoveredObject = newHovered;
+    }
+  }
+
+  updateLaser(ctrl, intersection) {
+    for (let child of ctrl.controller.children) {
+      if (child instanceof Line) {
+        if (intersection.result) {
+          child.visible = true;
+          // Extend laser to hit point
+          const hitDistance = intersection.result.distance;
+          child.scale.set(1, 1, hitDistance);
+        } else {
+          child.visible = false;
+          child.scale.set(1, 1, 2);   // default length when visible
+        }
+      }
+    }
+  }
+
+  /*
+   * Initialize a laser line for a controller
+   */
+  buildLaserLine() {
+    const laserMaterial = new LineBasicMaterial({ 
+      color: 0x10faef, 
+      transparent: true, 
+      opacity: 0.7 
+    });
+    const laserPoints = [new Vector3(0, 0, -0.05), new Vector3(0, 0, -1)];
+    const laserGeometry = new BufferGeometry().setFromPoints(laserPoints);
+    let laserLine = new Line(laserGeometry, laserMaterial);
+    laserLine.visible = false;
+    return laserLine;
+  }
+
+  /*
+   * onSelectStart event handler
+   */
+  onSelectStart(i, e) {
+    const ctrl = this.controllerStates[i];
+    if (ctrl.controller == null) return;
+
+    const intersection = this.getIntersection(i);
+
+    if (intersection.interactiveObj) {
+      if (ctrl.pressedObject != intersection.interactiveObj) {
+        ctrl.pressedObject = intersection.interactiveObj;
+        ctrl.pressStartTime = Date.now();
+        ctrl.lastIntersectionTime = Date.now();
+
+        // Optional immediate feedback
+        if (ctrl.pressedObject.userData.onPress) {
+          ctrl.pressedObject.userData.onPress(intersection);
+        }
+      }
+    }
+  }
+
+  /*
+   * onSelectEnd event handler
+   */
+  onSelectEnd(i, e) {
+    const ctrl = this.controllerStates[i];
+    if (!ctrl.pressedObject) return;
+
+    const timeHeld = Date.now() - ctrl.pressStartTime;
+    if (timeHeld > WebXRManager.MAX_CLICK_DURATION) {
+      ctrl.pressedObject = null;
+      return;
+    }
+
+    const intersection = this.getIntersection(i);
+
+    const stillPointingAtSameObject =
+      intersection.interactiveObj &&
+      intersection.interactiveObj == ctrl.pressedObject;
+
+    // Click detection
+    if (
+      stillPointingAtSameObject || 
+      (Date.now() - ctrl.lastIntersectionTime) < INTERSECTION_TOLERANCE)
+    {
+      if (ctrl.pressedObject.userData.onClick) {
+        ctrl.pressedObject.userData.onClick(intersection);
+      }
+    }
+
+    ctrl.pressedObject = null;
+  }
+
+  /*
+   * Raycast from a specific controller
+   */
+  getIntersection(i) {
+    const ctrl = this.controllerStates[i];
+    const controller = ctrl.controller;
+    if (!controller) {
+      return {
+        idxController: i,
+        result: null, 
+        interactiveObj: null
+      };
+    }
+
+    this.tempMatrix.identity().extractRotation(controller.matrixWorld);
+    this.raycaster.ray.origin.setFromMatrixPosition(controller.matrixWorld);
+    this.raycaster.ray.direction.set(0, 0, -1).applyMatrix4(this.tempMatrix);
+    const intersects = this.raycaster.intersectObjects(this.selectableObjects, true);
+    
+    let intersect = intersects.length > 0 ? intersects[0] : null;
+    let interactiveObj = null;
+    
+    if (intersect != null)  {
+      interactiveObj = intersect.object;
+      while (interactiveObj && !interactiveObj.userData.isInteractive) {
+        interactiveObj = interactiveObj.parent;
+      }
+      if (interactiveObj && !interactiveObj.userData.isInteractive) {
+        interactiveObj = null;
+      }    
+    }
+
+    return {
+      idxController: i,
+      result: intersect, 
+      interactiveObj: interactiveObj
+    };
+  }
+
+  /*
+   * Clear the controllers array
+   */
+  clearControllers() {
+    try {
+      for (let i = 0; i < 2; ++i) {
+        const controller = this.controllerStates[i];
+        controller.removeEventListener('selectstart', (e) => this.onSelectStart(i, e).bind(this));
+        controller.removeEventListener('selectend', (e) => this.onSelectEnd(i, e).bind(this));
+      }
+    } catch (e) {}
+
+    this.controllers = [null, null];
+    
+    this.controllerStates = [{ 
+      controller: null,
+      pressedObject: null,
+      pressStartTime: 0,
+      lastIntersectionTime: 0,
+      currentHoveredObject: null
+    }, {
+      controller: null,
+      pressedObject: null,
+      pressStartTime: 0,
+      lastIntersectionTime: 0,
+      currentHoveredObject: null
+    }];
+  }
+
+  /*
    * Clear the WebXRManager object
    */
   dispose() {
+    for (let i = 0; i < 2; ++i) {
+      const controllerGrip = this.world3d.renderer.xr.getControllerGrip(i);
+      if (controllerGrip == null) continue;
+      controllerGrip.removeEventListener('connected', this.onInputSourcesChange.bind(this));
+      controllerGrip.removeEventListener('disconnected', this.onInputSourcesChange.bind(this));
+    }
+
+    this.clearControllers();
+
+    this.controllers = null;
+    this.controllerStates = null;
+    this.selectableObjects = null;
+    this.loader = null;
     this.world3d = null;
     this.session = null;
-    this.loader = null;
-
-    this.controllers = [];
-    this.controllerInputSources = [];
-    this.controllerModels = [];
   }
 
 }

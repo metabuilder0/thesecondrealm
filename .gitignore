@@ -1,7 +1,9 @@
 .cache/
+.vscode/
 js/libs/@webxr-input-profiles/assets/dist/profiles/
 static/data/
 static/images/
+static/kiosks/
 static/music/
 static/sounds/
 static/tours/
@@ -9,3 +11,5 @@ static/videos/
 static/webxr/
 fiveserver.config.js
 urls.txt
+.DS_Store
+**/.DS_Store

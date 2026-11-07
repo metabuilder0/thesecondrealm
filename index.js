@@ -15,6 +15,14 @@ function openWorld3d(param) {
 }
 
 /*
+ * Open kiosk passed in URL params 
+ */
+function openKiosk(urlKiosk) {
+  sessionStorage.setItem('urlKiosk', urlKiosk);
+  goToPage('#kiosk');
+}
+
+/*
  * UI INITIALIZATION
  */
 
@@ -32,6 +40,13 @@ function initPages() {
   console.log('Start initialization');
   // Initializes the DataStore (global variable)
   dataStore = new DataStore();
+  // Compares app version of loaded html with cached version
+  const cachedVersion = sessionStorage.getItem('appVersion');
+  if (cachedVersion != appVersion) {
+    // Different versions => Clears the cache and reloads the app
+    sessionStorage.setItem('appVersion', appVersion);
+    window.location.reload(true);
+  }
   // Sets default page
   sessionStorage.setItem('activePage', '#home');
   // Resets the scene params stored in session
@@ -40,9 +55,15 @@ function initPages() {
   initPages();
   // Detects URL parameter
   const urlParams = new URLSearchParams(window.location.search);
+  const p = urlParams.get('p');
   const r = urlParams.get('r');
+  const k = urlParams.get('k');
   if (r != null) {
     openWorld3d(r);
+  } else if (k != null) {
+    openKiosk(k);
+  } else if (p != null) {
+    goToPage('#'+p);
   } else {
     goToPage('#home');
   }

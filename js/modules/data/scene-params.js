@@ -32,6 +32,7 @@ class SceneParams {
   song = null;
   tour = null;
   timelapseMode = false;
+  boundaries = true;
 
   filterMinH = Number.NEGATIVE_INFINITY;
   filterMaxH = Number.POSITIVE_INFINITY;
@@ -78,6 +79,8 @@ class SceneParams {
       this.tour = obj.tour;
     if (obj.timelapseMode != null)
       this.timelapseMode = obj.timelapseMode;
+    if (obj.boundaries != null)
+      this.boundaries = obj.boundaries;
 
     if (obj.filterMinH != null)
       this.filterMinH = obj.filterMinH;
@@ -113,6 +116,7 @@ class SceneParams {
       'song': this.song,
       'tour': this.tour,
       'timelapseMode': this.timelapseMode,
+      'boundaries': this.boundaries,
       'filterMinH': this.filterMinH,
       'filterMaxH': this.filterMaxH,
       'filterMinX': this.filterMinX,
@@ -136,6 +140,8 @@ class SceneParams {
 
   // Serialize the SceneParams object in a format used in URLs
   serialize() {
+    // Warning: Order matters!
+    // Add new entries to the end of the array
     const properties = [
       this.name,
       this.seriesX,
@@ -157,6 +163,7 @@ class SceneParams {
       this.filterMaxY,
       this.filterMinZ,
       this.filterMaxZ,
+      this.boundaries
     ];
     const json = JSON.stringify(properties);
     const encoded = new TextEncoder().encode(json);
@@ -187,7 +194,8 @@ class SceneParams {
       'filterMinY': (obj[16] == null) ? Number.NEGATIVE_INFINITY : obj[16],
       'filterMaxY': (obj[17] == null) ? Number.POSITIVE_INFINITY : obj[17],
       'filterMinZ': (obj[18] == null) ? Number.NEGATIVE_INFINITY : obj[18],
-      'filterMaxZ': (obj[19] == null) ? Number.POSITIVE_INFINITY : obj[19]
+      'filterMaxZ': (obj[19] == null) ? Number.POSITIVE_INFINITY : obj[19],
+      'boundaries': obj[20]
     });
   }
 }

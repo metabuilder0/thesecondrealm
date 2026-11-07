@@ -5,10 +5,12 @@
 		<title>The Second Realm</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="Cache-control" content="no-cache">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300&subset=latin,latin-ext" 
           rel="stylesheet"
           type="text/css">
 		<link type="text/css" rel="stylesheet" href="/css/thesecondrealm.css">
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 	</head>
 
   <body>
@@ -58,6 +60,11 @@
              data-include-html="pages/credits/credits.html"      
              hidden>
         </div>
+        <!-- KIOSK -->
+        <div id="kiosk" 
+             data-include-html="pages/kiosk/kiosk.html"      
+             hidden>
+        </div>
       </div>
     </div>
 
@@ -75,6 +82,12 @@
 		</script>
 
     <script src="./globals.js"></script>
+    
+    <script>
+      // Set app version
+      appVersion = '0.4.0';
+    </script>
+    
     <script type="module" src="./index.js"></script>
 
   </body>

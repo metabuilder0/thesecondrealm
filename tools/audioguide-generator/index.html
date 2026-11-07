@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<title>The Second Realm - Audioguide Generator</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,100,300&subset=latin,latin-ext" 
+          rel="stylesheet"
+          type="text/css">
+		<link type="text/css" rel="stylesheet" href="/css/thesecondrealm.css">
+	</head>
+
+  <body>
+
+    <table id="audioguide-generator-table">
+      <tr>
+        <td colspan="3" class="intro">
+          <span>This tool allows to generate an audio version of a Guided Tour thanks to a Text-to-Speech system. For each step of the tour a .wav file is generated in the download directory of your browser. An updated version of the JSON is also returned with "lang" and "music_level" attributes added to the root of the JSON and an "audiofile" attribute added to each step of the tour.</span>
+          <br/><br/>
+          <span>HowTo:</span>
+          <br/>
+          <span>
+            &nbsp;&nbsp;1/ Paste the JSON of the Guided Tour.<br/>
+            &nbsp;&nbsp;2/ Define the parameters of the generation:<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- language,<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- speaker model,<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- relative volume level of background music (volume level of voice is 1),<br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- base URL used to build the URLs of audio files that will appear in JSON).<br/>
+            &nbsp;&nbsp;3/ Click the "GENERATE AUDIO FILES" button.
+          </span>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+          <textarea id="tour-text" 
+                    rows="20" 
+                    cols="50"
+                    placeholder="PASTE THE JSON ENCODING A GUIDED TOUR"></textarea>
+        </td>
+        <td>
+          <label for="lang-select">LANGUAGE</label>
+          <br/>
+          <select id="lang-select">
+            <option value="en">English</option>
+            <option value="fr">French</option>
+            <option value="ko">Korean</option>
+            <option value="pt">Portuguese</option>
+            <option value="es">Spanish</option>
+          </select>
+          <br/>
+          <br/>
+          <label for="speaker-select">SPEAKER</label>
+          <br/>
+          <select id="speaker-select">
+            <option value="M1">Male 1</option>
+            <option value="M2">Male 2</option>
+            <option value="M3">Male 3</option>
+            <option value="M4">Male 4</option>
+            <option value="M5">Male 5</option>
+            <option value="F1">Female 1</option>
+            <option value="F2">Female 2</option>
+            <option value="F3">Female 3</option>
+            <option value="F4">Female 4</option>
+            <option value="F5">Female 5</option>
+          </select>
+          <br/>
+          <br/>
+          <label for="voice-level-text">VOICE VOLUME</label>
+          <br/>
+          <input type="number"
+                 id="voice-level-text"
+                 value="1"/>
+          <br/>
+          <br/>
+          <label for="music-level-text">BACKGROUND MUSIC VOLUME</label>
+          <br/>
+          <input type="number"
+                id="music-level-text"
+                value="0.4"/>
+          <br/>
+          <br/>
+          <label for="basepath-text">BASE URL OF AUDIO FILES</label>
+          <br/>
+          <input type="text"
+                 id="basepath-text"/>
+          <br/>
+          <button id="generate-btn">GENERATE AUDIO FILES &gt;&gt;</button>
+        </td>
+        <td>
+          <textarea id="result-text" 
+                    rows="20" 
+                    cols="50"
+                    placeholder="LOGS AND UPDATED JSON WILL BE DISPLAYED HERE"></textarea>
+        </td>
+      </tr>
+
+    </table>
+
+    <script type="module" src="./index.js"></script>
+  </body>
+
+</html>

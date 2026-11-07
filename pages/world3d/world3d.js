@@ -17,6 +17,10 @@ const world3dScript = {
   // World3D component
   world3d: null,
 
+  // Tour type
+  tourType: null,
+
+
   /*
    * Initialize the page
    */
@@ -25,14 +29,24 @@ const world3dScript = {
 
     // Buttons
     document.querySelector('#start-immersion-btn').addEventListener(
-      'click', () => { world3dScript.confirmImmersion(); }
+      'click', async () => { await world3dScript.confirmImmersion(); }
     );
 
     document.querySelector('#cancel-btn').addEventListener(
-      'click', () => { window.location.href='https://www.federalreserve.gov/'; }
+      'click', () => { 
+        if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+          goToPage('#kiosk');
+        } else {
+          window.location.href='https://www.federalreserve.gov/';
+        }
+      }
     );
 
     document.querySelector('#back-btn').addEventListener(
+      'click', () => { window.history.back(); }
+    );
+
+    document.querySelector('#back-btn2').addEventListener(
       'click', () => { window.history.back(); }
     );
   },
@@ -49,14 +63,17 @@ const world3dScript = {
     // Retrieves the scene params
     const sceneParams = SceneParams.fromJSON(sessionStorage.getItem('sceneParams'));
     if (sceneParams == null) return;
-    // Preloads the data series
+    // Displays a loading message 
+    world3dScript.setLoadingMessage('LOADING');
     world3dScript.showDiv('#loading');
+    // Preloads the data series
     await world3dScript.loadDataSeries(sceneParams);
     // Checks the active mode (builder/explorer)
+    // and starts the immersion or asks for a confirmation
     if (sceneParams.mode == SceneParams.MODE_BUILDER) {
-      world3dScript.confirmImmersion();
+      await world3dScript.confirmImmersion();
     } else {
-      document.querySelector('#location-span').textContent = sceneParams.name;
+      world3dScript.setLocationName(sceneParams.name);
       world3dScript.showDiv('#confirm-teleport');
     }
   },
@@ -64,12 +81,31 @@ const world3dScript = {
   /*
    * Start the immersion
    */
-  startImmersion: () => {
+  startImmersion: async () => {
+    // Displays a loading message
+    world3dScript.setLoadingMessage('LOADING SCENE PARAMETERS');
+    world3dScript.showDiv('#loading');
+    // Loads scene parameters from session
     const sceneParams = SceneParams.fromJSON(sessionStorage.getItem('sceneParams'));
     if (sceneParams == null) return;
+    // Builder mode starts in free flight so the tour can be edited.
+    // Explorer mode follows the tour type from the start.
+    const isBuilder = sceneParams.mode == SceneParams.MODE_BUILDER;
+    world3dScript.tourType = isBuilder
+      ? null
+      : await world3dScript.getTourType(sceneParams);
     // Initializes a World component
+    world3dScript.showDiv('#container');
     let gridContainer = document.getElementById('container');
-    world3dScript.world3d = new World3D(gridContainer);
+    world3dScript.world3d = new World3D(
+      gridContainer, 
+      world3dScript.tourType,
+      sceneParams.boundaries
+    );
+    world3dScript.world3d.xrManager.addEventListener(
+      'userleft', 
+      world3dScript.onUserLeft.bind(world3dScript)
+    );
     world3dScript.world3d.xrManager.addEventListener(
       'sessionend', 
       world3dScript.endImmersion.bind(world3dScript)
@@ -79,13 +115,26 @@ const world3dScript = {
   },
 
   /*
+   * Extracts the tourType from sceneParams
+   */
+  getTourType: async (sceneParams) => {
+    let tourType = null;
+    if (sceneParams.tour) {
+      const tourDescriptor = await dataStore.getTourDescriptorFile(sceneParams.tour);
+      if (tourDescriptor) {
+        tourType = tourDescriptor['type'];
+      }
+    }
+    return tourType
+  },
+
+  /*
    * Confirm immersion 
    * (wrapper for startImmersion() in explorer mode)
    */
-  confirmImmersion: () => {
-    document.querySelector('#location-span').textContent = '';
-    world3dScript.showDiv('#container');
-    world3dScript.startImmersion();
+  confirmImmersion: async () => {
+    world3dScript.setLocationName('');
+    await world3dScript.startImmersion();
   },
 
 
@@ -93,13 +142,23 @@ const world3dScript = {
    * Load initial data
    */
   loadDataSeries: async (sceneParams) => {
-    return Promise.all([
-      dataStore.getSeries('index'),
-      dataStore.getSeries('time'),
-      dataStore.getSeries(sceneParams.seriesX),
-      dataStore.getSeries(sceneParams.seriesY),
-      dataStore.getSeries(sceneParams.seriesZ)
-    ]);
+    try {
+      world3dScript.setLoadingMessage('LOADING DATA SERIES');
+      return Promise.all([
+        dataStore.getSeries('index'),
+        dataStore.getSeries('time'),
+        dataStore.getSeries(sceneParams.seriesX),
+        dataStore.getSeries(sceneParams.seriesY),
+        dataStore.getSeries(sceneParams.seriesZ)
+      ]);
+    } catch (e) {
+      if (!(e instanceof Error)) {
+        e = new Error(e);
+      }
+      world3dScript.setErrorMessage(`${e.message}`);
+      world3dScript.showDiv('#error');
+      throw e;
+    }
   },
 
 
@@ -112,17 +171,9 @@ const world3dScript = {
     const song = (sceneParams.song != 'null') ? sceneParams.song : getRandomSong();
 
     const displayMode = sceneParams.timelapseMode ? World3D.DISPLAY_MODE_ANIMATION : World3D.DISPLAY_MODE_STATIC;
-    
+
     [seriesH, seriesT, seriesX, seriesY, seriesZ] = await world3dScript.loadDataSeries(sceneParams);
     
-    let tourType = null;
-    if (sceneParams.tour) {
-      const tourDescriptor = await dataStore.getTourDescriptorFile(sceneParams.tour);
-      if (tourDescriptor) {
-        tourType = tourDescriptor['type'];
-      }
-    }
-
     const pointsCloudData = new PointsCloudData(
       sceneParams.seriesX, sceneParams.seriesY, sceneParams.seriesZ,
       seriesH, seriesT, seriesX, seriesY, seriesZ,
@@ -136,7 +187,7 @@ const world3dScript = {
     world3dScript.world3d.displayPointsCloud(pointsCloudData, displayMode);
     
     if (sceneParams.mode == SceneParams.MODE_BUILDER) {
-    // if (true) {
+    //if (true) {
       world3dScript.world3d.immersionModeActivated = true;     
       
       world3dScript.world3d.camera.moveTo(
@@ -146,21 +197,18 @@ const world3dScript = {
 
       world3dScript.world3d.hud.activate();
       
-      if (tourType == 'autopilot') {
-        world3dScript.world3d.initAutopilot();
-        await world3dScript.world3d.autopilot.load(sceneParams.tour);
-      }
-
       world3dScript.world3d.soundSystem.loadMusic(song);
 
-      if (sceneParams.tour) {
-        if (tourType == 'autopilot') {
-          world3dScript.world3d.autopilot.start();
-        } else {
-          world3dScript.world3d.initGuidedTour();
-          world3dScript.startGuidedTour(sceneParams.tour);
-        }
-      }
+      const tourPromise = sceneParams.tour
+        ? dataStore.getTourDescriptorFile(sceneParams.tour).catch((e) => {
+          console.log(e);
+          return null;
+        })
+        : null;
+      // Paint the compass and the main screens before building the tour panel.
+      await world3dScript.world3d.hud.whenRendered();
+      const descriptor = tourPromise ? await tourPromise : null;
+      world3dScript.world3d.hud.activateTourBuilder(descriptor, sceneParams);
 
     } else {
       await world3dScript.world3d.soundSystem.playIntro(async () => {
@@ -173,21 +221,12 @@ const world3dScript = {
 
         world3dScript.world3d.hud.activate();
 
-        if (tourType == 'autopilot') {
-          world3dScript.world3d.initAutopilot();
-          await world3dScript.world3d.autopilot.load(sceneParams.tour);
-        }
-
         setTimeout(() => {
           world3dScript.world3d.soundSystem.loadMusic(song);
-
+          
           if (sceneParams.tour) {
-            if (tourType == 'autopilot') {
-              world3dScript.world3d.autopilot.start();
-            } else {
-              world3dScript.world3d.initGuidedTour();
-              world3dScript.startGuidedTour(sceneParams.tour);
-            }
+            world3dScript.world3d.initTour();
+            world3dScript.world3d.startTour(sceneParams.tour);
           }
         }, 20); 
       });
@@ -204,35 +243,21 @@ const world3dScript = {
     );
     world3dScript.world3d.dispose();
     world3dScript.world3d = null;
-    goToPage('#configurator');
-  },
-
-  /*
-   * Start the organized tour 
-   */
-  startGuidedTour: async (url) => {
-    try {
-      await world3dScript.world3d.guidedTour.load(url);
-      world3dScript.world3d.guidedTour.start();
-    } catch (e) {
-      console.log('A problem was encountered while trying to load the tour: ' + url);
-      console.log(e);
+    if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+      goToPage('#kiosk');
+    } else {
+      goToPage('#configurator');
     }
   },
 
   /*
-   * Start the autopilot 
+   * onUserLeft event handler
    */
-  startAutopilot: async (url) => {
-    try {
-      await world3dScript.world3d.autopilot.load(url);
-      world3dScript.world3d.autopilot.start();
-    } catch (e) {
-      console.log('A problem was encountered while trying to load the autopilot: ' + url);
-      console.log(e);
+  onUserLeft: () => {
+    if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+      sessionStorage.removeItem('sectionKiosk');
     }
   },
-
 
   /*
    * Show a specific div
@@ -242,7 +267,8 @@ const world3dScript = {
       '#container',
       '#loading',
       '#confirm-teleport',
-      '#webxr-not-suppported'
+      '#webxr-not-suppported',
+      '#error'
     ]
     for (let d of divs) {
       document.querySelector(d).setAttribute('hidden', '');
@@ -251,6 +277,28 @@ const world3dScript = {
     document.querySelector(div).removeAttribute('hidden');
     document.querySelector(div).style.display = (div != '#container') ? 'flex' : 'block';
   },
+
+  /*
+   * Set location name
+   */
+  setLocationName: (name) => {
+    document.querySelector('#location-span').textContent = name;
+  },
+
+  /*
+   * Set loading message
+   */
+  setLoadingMessage: (msg) => {
+    document.querySelector('#loading-span').textContent = msg;
+  },
+
+  /*
+   * Set error message
+   */
+  setErrorMessage: (msg) => {
+    document.querySelector('#error-span').textContent = msg;
+  },
+
 
 };
 

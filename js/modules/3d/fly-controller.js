@@ -167,82 +167,87 @@ class FlyController extends EventDispatcher {
     this.rotAccelVector.y = 0;
     this.rotAccelVector.z = 0;
 
-    // Squeeze button: switch between translation and rotation modes
-    let isRotationMode = false;
-    
-    Object.values(this.world3d.xrManager.controllers).forEach(mc => {
-      Object.values(mc.components).forEach(c => {
-        if (c.type == Constants.ComponentType.SQUEEZE) {
-          if (c.values.state == Constants.ComponentState.PRESSED) {
-            isRotationMode = true;
-          }
-        }
-      });
-    });
-
-    // Refresh the acceleation state object
-    Object.values(this.world3d.xrManager.controllers).forEach(mc => {
-      Object.values(mc.components).forEach(c => {
-        switch (c.type) {
-          case Constants.ComponentType.TRIGGER:
+    try {
+      // Squeeze button: switch between translation and rotation modes
+      let isRotationMode = false;
+      for (let mc of this.world3d.xrManager.controllers) {
+        if (mc == null) continue;
+        Object.values(mc.components).forEach(c => {
+          if (c.type == Constants.ComponentType.SQUEEZE) {
             if (c.values.state == Constants.ComponentState.PRESSED) {
-              this.translAccelVector.z = -c.values.button;
+              isRotationMode = true;
             }
-            break;
-          case Constants.ComponentType.THUMBSTICK:
-          case Constants.ComponentType.TOUCHPAD:
-            if (c.values.state != Constants.ComponentState.DEFAULT) {
-              if (!isRotationMode) {
-                this.translAccelVector.y = -c.values.yAxis;
-                // yaw
-                this.rotAccelVector.y = -c.values.xAxis;
-              } else {
-                // roll
-                this.rotAccelVector.z = -c.values.xAxis;
-                // pitch
-                this.rotAccelVector.x = c.values.yAxis;
+          }
+        });
+      }
+
+      // Refresh the acceleration state object
+      for (let mc of this.world3d.xrManager.controllers) {
+        if (mc == null) continue;
+        Object.values(mc.components).forEach(c => {
+          switch (c.type) {
+            case Constants.ComponentType.TRIGGER:
+              if (c.values.state == Constants.ComponentState.PRESSED) {
+                this.translAccelVector.z = -c.values.button;
               }
-            }
-            break;
-          case Constants.ComponentType.BUTTON:
-            if (c.id == 'b-button' || c.id == 'y-button') {
-              if (
-                this.byButtonPushed == null &&
-                c.values.state == Constants.ComponentState.PRESSED
-              ) {
-                // Registers button pushed
-                this.byButtonPushed = c.id;
-              } else if (
-                c.id == this.byButtonPushed &&
-                c.values.state != Constants.ComponentState.PRESSED
-              ) {
-                // Button relased => Performs action
-                const nbSpeeds = FlyController.MAX_SPEEDS.length;
-                this.speedMode = Math.min(this.speedMode + 1, nbSpeeds-1);
-                this.byButtonPushed = null;
+              break;
+            case Constants.ComponentType.THUMBSTICK:
+            case Constants.ComponentType.TOUCHPAD:
+              if (c.values.state != Constants.ComponentState.DEFAULT) {
+                if (!isRotationMode) {
+                  this.translAccelVector.y = -c.values.yAxis;
+                  // yaw
+                  this.rotAccelVector.y = -c.values.xAxis;
+                } else {
+                  // roll
+                  this.rotAccelVector.z = -c.values.xAxis;
+                  // pitch
+                  this.rotAccelVector.x = c.values.yAxis;
+                }
               }
-            } else if (c.id == 'a-button' || c.id == 'x-button') {
-              if (
-                this.axButtonPushed == null &&
-                c.values.state == Constants.ComponentState.PRESSED
-              ) {
-                // Registers button pushed
-                this.axButtonPushed = c.id;
-              } else if (
-                c.id == this.axButtonPushed &&
-                c.values.state != Constants.ComponentState.PRESSED
-              ) {
-                // Button relased => Performs action
-                this.speedMode = Math.max(this.speedMode - 1, 0);
-                this.axButtonPushed = null;
+              break;
+            case Constants.ComponentType.BUTTON:
+              if (c.id == 'b-button' || c.id == 'y-button') {
+                if (
+                  this.byButtonPushed == null &&
+                  c.values.state == Constants.ComponentState.PRESSED
+                ) {
+                  // Registers button pushed
+                  this.byButtonPushed = c.id;
+                } else if (
+                  c.id == this.byButtonPushed &&
+                  c.values.state != Constants.ComponentState.PRESSED
+                ) {
+                  // Button relased => Performs action
+                  const nbSpeeds = FlyController.MAX_SPEEDS.length;
+                  this.speedMode = Math.min(this.speedMode + 1, nbSpeeds-1);
+                  this.byButtonPushed = null;
+                }
+              } else if (c.id == 'a-button' || c.id == 'x-button') {
+                if (
+                  this.axButtonPushed == null &&
+                  c.values.state == Constants.ComponentState.PRESSED
+                ) {
+                  // Registers button pushed
+                  this.axButtonPushed = c.id;
+                } else if (
+                  c.id == this.axButtonPushed &&
+                  c.values.state != Constants.ComponentState.PRESSED
+                ) {
+                  // Button relased => Performs action
+                  this.speedMode = Math.max(this.speedMode - 1, 0);
+                  this.axButtonPushed = null;
+                }
               }
-            }
-            break           
-          default:
-            //
-        }
-      });
-    });
+              break           
+            default:
+              //
+          }
+        });
+      };
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /*

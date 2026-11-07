@@ -27058,6 +27058,20 @@ class WebXRManager extends EventDispatcher {
 
 		};
 
+    this.getInputSource = function ( index ) {
+
+			let inputSource = controllerInputSources[ index ];
+
+			if ( inputSource === undefined ) {
+
+				inputSource = null;
+
+			}
+
+			return inputSource;
+
+		};
+
 		//
 
 		function onSessionEvent( event ) {
@@ -27350,18 +27364,18 @@ class WebXRManager extends EventDispatcher {
 
 					// Assign input source a controller that currently has no input source
 
-					for ( let i = 0; i < controllers.length; i ++ ) {
+					for ( let j = 0; j < controllers.length; j ++ ) {
 
-						if ( i >= controllerInputSources.length ) {
+						if ( j >= controllerInputSources.length ) {
 
 							controllerInputSources.push( inputSource );
-							controllerIndex = i;
+							controllerIndex = j;
 							break;
 
-						} else if ( controllerInputSources[ i ] === null ) {
+						} else if ( controllerInputSources[ j ] === null ) {
 
-							controllerInputSources[ i ] = inputSource;
-							controllerIndex = i;
+							controllerInputSources[ j ] = inputSource;
+							controllerIndex = j;
 							break;
 
 						}

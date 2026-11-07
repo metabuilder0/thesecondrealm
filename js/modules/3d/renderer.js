@@ -79,8 +79,8 @@ class Renderer extends WebGLRenderer {
     if (this.renderLoopEnabled && this.world3d.selectionHelper) {
       this.world3d.selectionHelper.update(delta);
     }
-    if (this.renderLoopEnabled && this.world3d.guidedTour) {
-      this.world3d.guidedTour.update(delta);
+    if (this.renderLoopEnabled && this.world3d.tour) {
+      this.world3d.tour.update(delta);
     }
     if (this.renderLoopEnabled && this.world3d.autopilot) {
       this.world3d.autopilot.update(delta);
