@@ -619,6 +619,12 @@ li {
   justify-content: end !important;
 }
 
+#tell-section4 {
+  background-image: url(/static/images/tsr_4.jpg);
+  text-align: left;
+  justify-content: start !important;
+}
+
 #tell-section3 #format-div2 {
   margin-top: 0;
 }
@@ -1510,7 +1516,8 @@ li {
   #tell-section1,
   #tell-section2,
   #tell-section3,
-  #tell-section4 {
+  #tell-section4,
+  #tell-section5 {
     padding-left: 1.25em;
     padding-right: 1.25em;
     box-sizing: border-box;
@@ -1547,7 +1554,8 @@ li {
 
   #tell-section2,
   #tell-section3,
-  #tell-section4 {
+  #tell-section4,
+  #tell-section5 {
     padding-top: 3.5em;
     padding-bottom: 4em;
   }
@@ -1556,7 +1564,8 @@ li {
   #tell-section2 .paragraph-right,
   #tell-section3 .paragraph-left,
   #tell-section3 .paragraph-right,
-  #tell-section4 .paragraph-left {
+  #tell-section4 .paragraph-left,
+  #tell-section5 .paragraph-left {
     width: 100%;
     max-width: 320px;
     margin: 0 auto;
@@ -1565,7 +1574,8 @@ li {
 
   #tell-section2 .title,
   #tell-section3 .title,
-  #tell-section4 .title {
+  #tell-section4 .title,
+  #tell-section5 .title {
     font-size: 20pt;
     line-height: 1.3;
     margin-bottom: 0.8em;
@@ -1573,20 +1583,23 @@ li {
 
   #tell-section2 .content,
   #tell-section3 .content,
-  #tell-section4 .content {
+  #tell-section4 .content,
+  #tell-section5 .content {
     font-size: 11pt;
     line-height: 1.7;
   }
 
   #tell-section2 ul,
-  #tell-section3 ul {
+  #tell-section3 ul,
+  #tell-section4 ul {
     margin-left: 1.2em;
     font-size: 11pt;
     line-height: 1.6;
   }
 
   #tell-section2 > .paragraph-left,
-  #tell-section4 #tips-div {
+  #tell-section4 #tips-div,
+  #tell-section5 > .paragraph-left {
     max-width: 320px;
     margin: 0 auto;
   }

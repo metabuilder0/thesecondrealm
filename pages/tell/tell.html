@@ -175,16 +175,71 @@
 </section>
 
 
-<section id="tell-section4" class="buffer">
+<section id="tell-section5" class="buffer">
 
-  <div id="tips-div" class="paragraph-left">
-    <h1 class="title">TIPS</h1>
-    <p class="content">
-      Using data values as coordinates allows points of interest to be defined independently of block positions, making it easier to fine-tune their placement for optimal visibility. 
-      However, this approach requires that the guided tour be used with realms configured with the same metrics for all three axes.
-    </p>
-    <p class="content">The guided tour is not just about the story—it’s also about the journey. The order of the points of interest significantly impacts the experience.</p>
-    <p class="content">When complete, the descriptor file must be hosted on a public web server, and its URL shared with the builder. If needed, we can host your descriptor file on our server. Contact us on <a href="https://t.me/+PYX-hDQ_sr03YWVk" target="_blank">Telegram</a></p>
+  <div class="paragraph-row">
+    <div class="paragraph-left">
+      <h1 class="title">THE TOUR BUILDER</h1>
+      <p class="content">
+        A Tour Builder is proposed on the left of the HUD when immersion is entered in builder mode. This tool allows to create and edit the stages composing the skeleton of the tour.
+        The panel lists the stages of the tour associated with the scene, or an empty circuit when none has been set.
+        From here the builder lays the stages, tries the journey, and carries the result back as a descriptor file.
+      </p>
+
+      <p class="content">The bar above the list offers the following buttons:</p>
+
+      <ul>
+        <li>
+          <span class="underline">TOUR TYPE:</span> Cycles the type of the tour among the three journeys described above: a guided tour, a guided tour on autopilot, or an automated wandering. The label shows the type currently selected.
+        </li>
+        <li>
+          <span class="underline">SPAWN POSITION:</span> Records the current position and orientation as the scene's spawn.
+        </li>
+        <li>
+          <span class="underline">ADD STAGE:</span> Adds a new stage to the tour. The current position is used for the coordinates of the stages and a virtual keyboard is used to enter the title of the stage.
+        </li>
+        <li>
+          <span class="underline">MODE:</span> Switches between EDIT AND TEST modes. TEST mode allows to test the tour without having to export the descriptor file. EDIT mode allows to edit the tour and export the descriptor file.
+        </li>
+        <li>
+          <span class="underline">EXPORT:</span> Downloads the descriptor as a JSON file. If a tour file is already associated with the realm, the export keeps all its existing fields and applies the edits made in the panel.
+        </li>
+      </ul>
+
+      <p class="content">Each stage in the list carries its own buttons:</p>
+
+      <ul>
+        <li>
+          <span class="underline">UP:</span> Moves the stage one place earlier in the circuit.
+        </li>
+        <li>
+          <span class="underline">DOWN:</span> Moves the stage one place later in the circuit.
+        </li>
+        <li>
+          <span class="underline">GO:</span> Teleports the dataship to the location of the stage.
+        </li>
+        <li>
+          <span class="underline">DEL:</span> Removes the stage from the list.
+        </li>
+      </ul>
+    </div>
+  </div>
+
+</section>
+
+
+<section id="tell-section4" class="parallax-left-container">
+
+  <div class="paragraph-row">
+    <div id="tips-div" class="paragraph-left">
+      <h1 class="title">TIPS</h1>
+      <p class="content">
+        Using data values as coordinates allows points of interest to be defined independently of block positions, making it easier to fine-tune their placement for optimal visibility. 
+        However, this approach requires that the guided tour be used with realms configured with the same metrics for all three axes.
+      </p>
+      <p class="content">The guided tour is not just about the story—it’s also about the journey. The order of the points of interest significantly impacts the experience.</p>
+      <p class="content">When complete, the descriptor file must be hosted on a public web server, and its URL shared with the builder. If needed, we can host your descriptor file on our server. Contact us on <a href="https://t.me/+PYX-hDQ_sr03YWVk" target="_blank">Telegram</a></p>
+    </div>
   </div>
 
 </section>
