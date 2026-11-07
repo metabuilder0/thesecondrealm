@@ -72,7 +72,11 @@ class AudioGuide extends AudioListener {
    * Stops the Audio 
    */
   stop(callback) {
-    this.#audio.stop();
+    try {
+      this.#audio.stop();
+    } catch (e) {
+      // The buffer source was already stopped.
+    }
     if (callback != null) {
       callback();
     }

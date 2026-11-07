@@ -88,8 +88,12 @@ const world3dScript = {
     // Loads scene parameters from session
     const sceneParams = SceneParams.fromJSON(sessionStorage.getItem('sceneParams'));
     if (sceneParams == null) return;
-    // Initializes the tour type
-    world3dScript.tourType = await world3dScript.getTourType(sceneParams);
+    // Builder mode starts in free flight so the tour can be edited.
+    // Explorer mode follows the tour type from the start.
+    const isBuilder = sceneParams.mode == SceneParams.MODE_BUILDER;
+    world3dScript.tourType = isBuilder
+      ? null
+      : await world3dScript.getTourType(sceneParams);
     // Initializes a World component
     world3dScript.showDiv('#container');
     let gridContainer = document.getElementById('container');
@@ -195,10 +199,16 @@ const world3dScript = {
       
       world3dScript.world3d.soundSystem.loadMusic(song);
 
-      if (sceneParams.tour) {
-        world3dScript.world3d.initTour();
-        world3dScript.world3d.startTour(sceneParams.tour);
-      }
+      const tourPromise = sceneParams.tour
+        ? dataStore.getTourDescriptorFile(sceneParams.tour).catch((e) => {
+          console.log(e);
+          return null;
+        })
+        : null;
+      // Paint the compass and the main screens before building the tour panel.
+      await world3dScript.world3d.hud.whenRendered();
+      const descriptor = tourPromise ? await tourPromise : null;
+      world3dScript.world3d.hud.activateTourBuilder(descriptor, sceneParams);
 
     } else {
       await world3dScript.world3d.soundSystem.playIntro(async () => {

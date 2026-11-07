@@ -9,6 +9,7 @@ import { HUDLeftScreen } from './hud-left-screen.js';
 import { HUDRightScreen } from './hud-right-screen.js';
 import { HUDRightMenu } from './hud-right-menu.js';
 import { HUDHelpScreen } from './hud-help-screen.js';
+import { HUDTourBuilderPanel } from './hud-tour-builder-panel.js';
 import { Compass } from './compass.js';
 
 
@@ -25,7 +26,13 @@ class HUD extends Group {
   rightMenu = null;
   #compass = null;
   helpScreen = null;
+  tourBuilderPanel = null;
   isHelpScreenOpen = false;
+  // Set when immersion is entered in builder mode. It does not follow TEST/EDIT.
+  builderMode = false;
+  // True only until the first update after activate().
+  #awaitingPaint = null;
+  #renderWaiters = null;
 
   /*
    * Constructor 
@@ -73,6 +80,10 @@ class HUD extends Group {
     this.isHelpScreenOpen = false;
     this.add(this.helpScreen);
 
+    // The tour builder is built after the first painted frame.
+    // Its keyboard alone is large enough to delay every other panel.
+    this.tourBuilderPanel = null;
+
     // Links the HUD to the camera's parent group
     this.position.z = -1000000
     this.world3d.camera.parent.add(this);
@@ -84,6 +95,34 @@ class HUD extends Group {
   activate() {
     this.position.z = 0;
     this.leftScreen.clearLoadingText();
+    this.#awaitingPaint = true;
+  }
+
+  /*
+   * Resolves after the HUD has been through one update since activate().
+   * The main screens can paint before the tour builder is constructed.
+   */
+  whenRendered() {
+    if (this.#awaitingPaint === false) return Promise.resolve();
+    return new Promise((resolve) => {
+      if (!this.#renderWaiters) this.#renderWaiters = [];
+      this.#renderWaiters.push(resolve);
+    });
+  }
+
+  /*
+   * Show the tour builder. descriptor is null when the scene has no tour.
+   */
+  activateTourBuilder(descriptor, sceneParams) {
+    this.builderMode = true;
+    if (!this.tourBuilderPanel) {
+      this.tourBuilderPanel = new HUDTourBuilderPanel(this.world3d, this);
+      this.tourBuilderPanel.position.set(-0.521, 0.854, -0.334);
+      this.tourBuilderPanel.rotation.y = 50 * Math.PI / 180;
+      this.tourBuilderPanel.visible = false;
+      this.add(this.tourBuilderPanel);
+    }
+    this.tourBuilderPanel.activate(descriptor, sceneParams);
   }
 
   /*
@@ -117,8 +156,16 @@ class HUD extends Group {
     try {
       ThreeMeshUI.update();
       this.rightMenu.updateMenu(delta);
+      // After three-mesh-ui, so meshes created this frame pick up the layer.
+      if (this.tourBuilderPanel) this.tourBuilderPanel.updatePanel();
     } catch {
       //
+    }
+    if (this.#awaitingPaint === true) {
+      this.#awaitingPaint = false;
+      const waiters = this.#renderWaiters;
+      this.#renderWaiters = null;
+      if (waiters) for (const resolve of waiters) resolve();
     }
   }
 
@@ -132,6 +179,7 @@ class HUD extends Group {
     this.rightMenu.dispose();
     this.#compass.dispose();
     this.helpScreen.dispose();
+    if (this.tourBuilderPanel) this.tourBuilderPanel.dispose();
     // Resets the references to others objects
     this.world3d = null;
     this.leftScreen = null;
@@ -139,6 +187,7 @@ class HUD extends Group {
     this.rightMenu = null;
     this.#compass = null;
     this.helpScreen = null;
+    this.tourBuilderPanel = null;
   }
 
 }

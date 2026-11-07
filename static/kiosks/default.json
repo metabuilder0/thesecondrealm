@@ -6,26 +6,47 @@
   "text_intro": "",
   "visual": "/static/images/tsr_1b.jpg",
   "collections": [{
+    "title": "GUIDED TOURS",
+    "desc": "Select a realm and let the AI guide you and tell you its tales.",
     "realms": [{
-      "name": "THE BITCOIN TSUNAMI (TOUR)",
-      "desc": "The Bitcoin wave is about to sweep the shore. A demo of a realm with a Guided Tour.",
-      "url": "index.html?r=9Tbj9cifRAFCQkk24rUwcp3Fask8XF5MuvCgu7svSfBXvh5kPRm25yU3UA7cA4HtxtUTGjzod1PBJPep6phovq5gek36mQRwHAXZLiwuPYDqwqEA3gXszfPz2U7RGVnbPC554QG2Wztfb5RYbfvVJ8VQWahhVoy9PaGWhLVMCy2FBJsuXpMrD29VcP1f7dRJwL1m4isD7RTyz2xi53e8vHRVcMsUoCK6B9iopF7XAKvqhsj5dvQ5VhUBMcgA2BYChE9K6dUhhHYi6EdaWjjQSqWgeNHc39rJQsNjR5MQ5mSQUbbcpPvqMzfBgW31xKVxwvJ816UnGKhXKvx2FbZ4aP6",
-      "visual": "/static/images/mini_3.jpg"
+      "name": "SATOSHI'S TREE",
+      "desc": "A tribute to those whose work gave roots to the tree planted by Satoshi.",
+      "url": "index.html?r=23aiCeHV6BhH1RXvo6knJSD7p5Z34sonpiu8BTDJSMGtrexHW2PhXiy4JTHpuAUEwWoZi6JwAVP5tdpYtdRdqsAkhXKXVJEacRLCmMz18D33YgqV9eFZXEPHvdTJ3M7Ek8vWiWbDEtzDBfeTUtZX1752HFxwhEaFLGVcSaTEBdhnKQYxNG1b1QJBgWjSdFQmHYLiMJu6piAWtL3SqQhaPcnf2nZtbnUM4LN9DnLYUFbvTmG3AN2xAtq8bSspwz9sxuPSBA9L8ntPT8rDZiMfptxEpAbBrfaWtkpRfAxtuXuBfEwifX9PX64m97RZ5SZhchQ9goh7yVfmQJQiUtrE6XEYykye8hbNPp7GCydsGGbN",
+      "visual": "/static/images/mini_9c.jpg"
     }, {
-      "name": "THE BITCOIN TSUNAMI (AUTO)",
-      "desc": "A demo of the same Guided Tour in autopilot mode.<br/>",
+      "name": "THE BITCOIN TSUNAMI",
+      "desc": "The Bitcoin wave is about to sweep the shore.",
       "url": "index.html?r=36f4PCde5o7WztW8MEviB2VhHTPqDyg5xZhQp1HkSyw4Aou52HwvewnpJoR7t2ZGoZvBzKn8H1Y7pRr7QLHmPKTgpxkPqiurJYkqmDonkLWwnKZaXSLHAuDyBf6zoRTLbt9uzWagAZtSHtapvcEda3uDCsYtkHUbjv562GgGrvH9KwBLuS3PKs6Tb2H1WxhqNkLueoF472EQBLCswC9bdsPNoZBZYaQtHjUgHTNWfFCCAWXwwtFxMDkg4vyMNTMEai6imkNzg1KRXx5hcqVFdnia89tzkczEMzJcXo4YrBmQSbKm1L7RxjRatVhdN3qdncc436WAsJevvKwYTcE42DdwLYrTg4JPFrYzG",
       "visual": "/static/images/mini_3.jpg"
     }, {
-      "name": "SATOSHI'S TREE (TIMELAPSE)",
-      "desc": "To see things in the seed, that is genius.<br/>A demo of the timelapse mode.",
-      "url": "index.html?r=BU9cA9TDNLLXdLHZczts1LfuXxtTCEN35rh5bmnG1ZatkgVSbzkFtqChX3LCrzkPpGm4WXeBz4cNfEqJUht9J3yjTeHggoBSee5c2irkx3U7uDMwm8AcDnrUFmMEid6TiwjAKDVQLnw2jnHg3ZuRLFA67cV4xncvAZW4bdk1nNxXq4PEKDHGqeNJcArHzF8L4Y4w4S9qk79ZJxXrYX6ZPBtUWyXZYdZB7eosnrzWUv4mLjzypArfj23qZwhmiA1b1SqqiRtWhkEmPWN8uA3B4UcsNyNy4SBnfPdcfZM36fe9i6C5z9n3DNmshdRPa",
-      "visual": "/static/images/mini_9c.jpg"
+      "name": "PATOSHI'S BOX",
+      "desc": "Follow the fingerprint left by Satoshi in the nonces of the first blocks.",
+      "url": "index.html?r=3wEgZNi9mhozg7roJT9NcAfdYPrN7H3WihMLN6Lmv4yRNUPBJFiTH4mF8EbmKnVGzW4LxpkEFKjR1bPbm7JhPQza2oFhLEReZG6F4wsvF6DJFW8j4SNSPjvK9ThJua5KLak478UEQFUEXnqtYZuijUaLvZmMVvGXiVfExKT3jB6qTi7q9KaTXAx9QH6kANbMCsGQrBD2yPuf7KjVh6driw8nDW2q5ZMurHWfFn4GxBgHNuk58rXEMoUtQpKDJzWnAa61Ph9ZdhQYhpXZniXeej9K9QADQunYHz",
+      "visual": "/static/images/mini_15b.jpg"
     }, {
-      "name": "BOREALIS (AUTO)",
-      "desc": "The beauty of the Northern lights. A demo of a realm with an Automated Wandering.",
+      "name": "SPAM IN THE SKY",
+      "desc": "A history of the dust and spam storms that swept through Bitcoin.",
+      "url": "index.html?r=LCxvnvJ3inZ8Kx7PZ5VHC1PGTnh3gtqG56RqaNGfaM5fcgZKsbZ6fGSZTYh51XzNfavUgoG2vcGKN38b3v4WwoUV919nHz9YSaB7qYPMM7frSh4BsVGEgjtVg2vmc4AKqEAcxMUwM6rgJamFRwNo8K9J5JpuD1XWPVutWsfLtdKjidw9Z3RXNJwDUp9TwnM4hFSb8eToe72GzJH9wsPCoQ7qL2ginJAQupKAM9m8LZKPfReJatFCTtVyVoYQgMKu3JX1A91rHQXYWMQCVNXwtkrtiiJuUa97Gq9fFn4",
+      "visual": "/static/images/mini_5b.jpg"
+    }, {
+      "name": "BOREALIS",
+      "desc": "A silent journey through the Northern Lights.",
       "url": "index.html?r=JznebnfwKNouTYkv95bBQntrfrE4QuTPgc4hN8UVZzfME3juXU92BFZLwckugjgmjVioVwSwjaM3Vgm7Czbj8RWKsJPvjCL5VCDDVQkhK9vkF5g8Pg2QNryjkiMrGGwNNgxw7KFYj2Jk9NPDgtbU3pWcAkm7cDJ8aUcY4acZwShLv2Gw3oAEzLRMc2jizPjmgJTZGs9D9655yXaDcd5Ry4zoCuPqdDBTRx6LJTcqPNzGHrFAFkJgLCQSF4SWVSr24C6vwnJMYzWwfcrafUPpAvnvqP6tghbBaEWxfWu1XVEZUC2Fos3NKw3fKM4MCFG3YoC6QwuPThyBiLDfd3TbYMMt1eeUAyUBWMmt9iTR6Vt5SteSd1vTXTKvKdhrPDVTQo4bng4bakGKogWAt1uDBxY",
       "visual": "/static/images/mini_15.jpg"
+    }]
+  }, {
+    "title": "THE EXPLORERS CLUB",
+    "desc": "Become the explorer that you always wanted to be and explore the realms at your own pace by piloting your dataship",
+    "realms": [{
+      "name": "THE BITCOIN TSUNAMI",
+      "desc": "The Bitcoin wave is about to sweep the shore. A demo of a realm with a Guided Tour.",
+      "url": "index.html?r=9Tbj9cifRAFCQkk24rUwcp3Fask8XF5MuvCgu7svSfBXvh5kPRm25yU3UA7cA4HtxtUTGjzod1PBJPep6phovq5gek36mQRwHAXZLiwuPYDqwqEA3gXszfPz2U7RGVnbPC554QG2Wztfb5RYbfvVJ8VQWahhVoy9PaGWhLVMCy2FBJsuXpMrD29VcP1f7dRJwL1m4isD7RTyz2xi53e8vHRVcMsUoCK6B9iopF7XAKvqhsj5dvQ5VhUBMcgA2BYChE9K6dUhhHYi6EdaWjjQSqWgeNHc39rJQsNjR5MQ5mSQUbbcpPvqMzfBgW31xKVxwvJ816UnGKhXKvx2FbZ4aP6",
+      "visual": "/static/images/mini_3.jpg"
+    },  {
+      "name": "SATOSHI'S TREE (TIMELAPSE)",
+      "desc": "To see things in the seed, that is genius.",
+      "url": "index.html?r=BU9cA9TDNLLXdLHZczts1LfuXxtTCEN35rh5bmnG1ZatkgVSbzkFtqChX3LCrzkPpGm4WXeBz4cNfEqJUht9J3yjTeHggoBSee5c2irkx3U7uDMwm8AcDnrUFmMEid6TiwjAKDVQLnw2jnHg3ZuRLFA67cV4xncvAZW4bdk1nNxXq4PEKDHGqeNJcArHzF8L4Y4w4S9qk79ZJxXrYX6ZPBtUWyXZYdZB7eosnrzWUv4mLjzypArfj23qZwhmiA1b1SqqiRtWhkEmPWN8uA3B4UcsNyNy4SBnfPdcfZM36fe9i6C5z9n3DNmshdRPa",
+      "visual": "/static/images/mini_9c.jpg"
     }, {
       "name": "BOREALIS",
       "desc": "The original Borealis realm, in manual piloting mode.",
@@ -65,11 +86,6 @@
       "name": "SPAM IN THE SKY",
       "desc": "Can you spot the spam?",
       "url": "index.html?r=ZCMrgr2Mv55KD67AYxAqxukQGsShDDYV827qyihWjLxUS1fHnsn1WmFpmRu8RWvHwDE8vXH2Z6ieLAgUsyaL6W7VG7gdFKMrnofXFC4TFWksSKSK2k7Fkz1nJzfyxTdaNeB3bBmsAs7t1w4LR54aVJf4DLg5c9w4knPb1ZB9JVLWFJC6Yi4R7yLjCzAeDqsHBCpuxPDAqEa4ExzzhpjNdF4gZsYocpzndVUTHRiAqjpJ3DUEEaPp4Xjm7ADo9dUPwJ",
-      "visual": "/static/images/mini_5b.jpg"
-    }, {
-      "name": "SPAM IN THE SKY (TOUR)",
-      "desc": "A history of Bitcoin dust transaction and spam storms in a Guided Tour.",
-      "url": "index.html?r=25auNqNZxi2Kn8SsDKPzMyP4cuam955kUwRRLCzXNuLtYNejLjLwPufadrsFiVXcPeASecyxoyX5oQwDkh5K7D9A9FqFN34Sri4tEC2zNzCBpSPCtYBBYgKvPjjqvCiuxbteJETtDX1bGACbtfpkScvcbkboqVFAeMueA9intDsRbWFBxR4JtkPJR5vf1pU3YA42LHQ792qPWeSJJDmcm9tdD148GceYHYE8HoX8QAB1Zsfebdx9tc7a6FUKjwRQTHzo9L15KJwAVqPNJRxzwfPj1CxhKVjTtYVwBTk4QfqQVJkcUiTn",
       "visual": "/static/images/mini_5b.jpg"
     }, {
       "name": "HOLO-TEHOTIHUACAN",
