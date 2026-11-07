@@ -91,6 +91,11 @@
       "desc": "\"Don't open the noisy box, Pandora.\"",
       "url": "index.html?r=At4n3S9oaBfzK4D3uURpoUZcSoEUCGQ24g63J7DusvxCq1pnNUWMVwShqjqjXsPkv5RHTrGUnVgVt7MQ7HhjEBVBXDf39iFwy6iJbTeA3n9oPr3KB7JN2DGwAkYRLTMsMnzxaEzJ9RZiVGKwz9c55FJHaHTVJy4uJGgthAoR7heYNzQLL1vVpYi7rGVHDKLLvU1LXmnvdWepnLntK7ApM9nTA66PDxUJeMM72o9VNzGphFwZbenrNY",
       "visual": "/static/images/mini_15b.jpg"
+    }, {
+      "name": "PATOSHI'S BOX (AUTO)",
+      "desc": "Follow the fingerprint left by Satoshi in the nonces of the first blocks. An Automated Wandering with filters.",
+      "url": "index.html?r=DxPPbtpdiK8RZfGoN2PxNDfWHZrtAhp6B36kU6aHFEY2ZmrtT9wxyucHLw2SdumoaoFm7PjoUDgCycnkRgq7Fvu6nw9s1tFnmPc96RDk1C1H91b6eAyd5NSK6Lpv32z3wRw2i3yC9csCisfsemdsZxLQEqTQiXNG72EhVmQXwyhSWxU8pFamAh7qYQK1oqnhqZRHC3vWiTPi2wLGnxP88h73mfKBJ9Qxk4xLpxPgPRZ3DJW67yhBpdgPd4dWk8JK66J4H9n8qL9W3yvMG3qtdAogACC2LEJrw3z",
+      "visual": "/static/images/mini_15b.jpg"
     }]
   }]
 }
