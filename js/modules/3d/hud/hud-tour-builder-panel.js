@@ -295,6 +295,10 @@ class HUDTourBuilderPanel extends Group {
     return value;
   }
 
+  /*
+   * Teleport to the stage and show its filter.
+   * A stage without a filter shows every point again.
+   */
   teleportTo(index) {
     if (!this.tourEditor) return;
     const position = this.tourEditor.getStageWorldPosition(
@@ -308,6 +312,7 @@ class HUDTourBuilderPanel extends Group {
       rotation.y,
       rotation.z
     ]);
+    this.#applyStageFilters(index);
   }
 
   cycleType() {
@@ -368,6 +373,10 @@ class HUDTourBuilderPanel extends Group {
 
   #enterTest() {
     this.closeFilters();
+    // A GO preview must not stay on while the tour applies its own filters.
+    if (this.world3d.pointsCloud) {
+      this.world3d.pointsCloud.filterPointsCloud(null);
+    }
     if (!this.tourEditor.stages.length) {
       this.hud.leftScreen.displayMessage(
         'TOUR BUILDER',
@@ -440,9 +449,16 @@ class HUDTourBuilderPanel extends Group {
   }
 
   #previewFilters() {
+    this.#applyStageFilters(this.#filterStageIndex);
+  }
+
+  /*
+   * Show the filter of a stage. An empty filter shows every point.
+   */
+  #applyStageFilters(index) {
     const pointsCloud = this.world3d.pointsCloud;
     if (!pointsCloud || !this.tourEditor) return;
-    const stage = this.tourEditor.stages[this.#filterStageIndex];
+    const stage = this.tourEditor.stages[index];
     const filters = stage && Array.isArray(stage.filters) && stage.filters.length
       ? stage.filters
       : null;
