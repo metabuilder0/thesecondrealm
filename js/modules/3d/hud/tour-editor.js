@@ -118,11 +118,71 @@ class TourEditor {
   }
 
   /*
+   * Append an OR group that already contains one condition.
+   * An empty group would match every block.
+   */
+  addFilterGroup(stageIndex, condition) {
+    const stage = this.#stageAt(stageIndex);
+    if (!stage || !Array.isArray(condition)) return false;
+    if (!Array.isArray(stage.filters)) stage.filters = [];
+    stage.filters.push([TourEditor.clone(condition)]);
+    return true;
+  }
+
+  removeFilterGroup(stageIndex, groupIndex) {
+    const stage = this.#stageAt(stageIndex);
+    if (!stage || !Array.isArray(stage.filters)) return;
+    if (groupIndex < 0 || groupIndex >= stage.filters.length) return;
+    stage.filters.splice(groupIndex, 1);
+    if (stage.filters.length == 0) delete stage.filters;
+  }
+
+  addFilterCondition(stageIndex, groupIndex, condition) {
+    const stage = this.#stageAt(stageIndex);
+    if (!stage || !Array.isArray(condition) || !Array.isArray(stage.filters)) return false;
+    const group = stage.filters[groupIndex];
+    if (!Array.isArray(group)) return false;
+    group.push(TourEditor.clone(condition));
+    return true;
+  }
+
+  /*
+   * Removing the last condition of a group removes the group.
+   * Removing the last group drops the filters attribute.
+   */
+  removeFilterCondition(stageIndex, groupIndex, conditionIndex) {
+    const stage = this.#stageAt(stageIndex);
+    if (!stage || !Array.isArray(stage.filters)) return;
+    const group = stage.filters[groupIndex];
+    if (!Array.isArray(group)) return;
+    if (conditionIndex < 0 || conditionIndex >= group.length) return;
+    group.splice(conditionIndex, 1);
+    if (group.length == 0) this.removeFilterGroup(stageIndex, groupIndex);
+  }
+
+  setFilterCondition(stageIndex, groupIndex, conditionIndex, condition) {
+    const stage = this.#stageAt(stageIndex);
+    if (!stage || !Array.isArray(condition) || !Array.isArray(stage.filters)) return false;
+    const group = stage.filters[groupIndex];
+    if (!Array.isArray(group) || !group[conditionIndex]) return false;
+    group[conditionIndex] = TourEditor.clone(condition);
+    return true;
+  }
+
+  /*
    * Descriptor ready to be exported or played.
    * guided_tour requires initial_pos: fall back to the first stage.
+   * Empty filter groups are dropped: one of them would match every block.
    */
   toJSON() {
     const out = TourEditor.clone(this.descriptor);
+    for (const stage of out.stages) {
+      if (!Array.isArray(stage.filters)) continue;
+      stage.filters = stage.filters.filter(
+        (group) => Array.isArray(group) && group.length > 0
+      );
+      if (stage.filters.length == 0) delete stage.filters;
+    }
     if (
       out.initial_pos == null
       && out.type == 'guided_tour'
@@ -135,6 +195,11 @@ class TourEditor {
 
   static clone(value) {
     return JSON.parse(JSON.stringify(value));
+  }
+
+  #stageAt(index) {
+    if (index < 0 || index >= this.descriptor.stages.length) return null;
+    return this.descriptor.stages[index];
   }
 
   #toDescriptorCoords(worldPosition, pointsCloud) {

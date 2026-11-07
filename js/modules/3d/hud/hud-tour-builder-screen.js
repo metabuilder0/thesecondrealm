@@ -181,7 +181,7 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
     });
 
     const titleBlock = new ThreeMeshUI.Block({
-      width: width - 4 * 0.036,
+      width: width - 5 * 0.036,
       height: height,
       margin: 0,
       padding: 0.003,
@@ -228,11 +228,19 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
       label: 'GO',
       onClick: () => this.panel.teleportTo(this.#stageIndex(slot))
     });
+    const fltButton = createHudButton(this.world3d, {
+      width: buttonWidth,
+      height: buttonHeight,
+      label: 'FLT',
+      fontSize: 0.005,
+      onClick: () => this.panel.openFilters(this.#stageIndex(slot))
+    });
 
     row.add(titleBlock);
     row.add(upButton);
     row.add(downButton);
     row.add(goButton);
+    row.add(fltButton);
     row.add(delButton);
 
     this.#rows.push({
@@ -240,6 +248,7 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
       upButton,
       downButton,
       goButton,
+      fltButton,
       delButton
     });
     return row;
@@ -295,8 +304,10 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
         row.downButton.setEnabled(false);
         row.goButton.setShown(this.#editEnabled);
         row.goButton.setEnabled(false);
+        row.fltButton.setEnabled(false);
         row.delButton.setLabel('');
         row.goButton.setLabel('');
+        row.fltButton.setLabel('');
         this.#setArrow(row.upButton, false, false);
         this.#setArrow(row.downButton, false, false);
         this.#setRowChrome(row, false);
@@ -306,6 +317,8 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
       row.titleText.set({ content: HUDTourBuilderScreen.clipTitle(stage.title) });
       row.delButton.setLabel('DEL');
       row.goButton.setLabel(this.#editEnabled ? 'GO' : '');
+      const groups = Array.isArray(stage.filters) ? stage.filters.length : 0;
+      row.fltButton.setLabel(groups > 0 ? `FLT ${groups}` : 'FLT');
       const upEnabled = this.#editEnabled && index > 0;
       const downEnabled = this.#editEnabled && index < count - 1;
       row.delButton.setEnabled(this.#editEnabled);
@@ -313,6 +326,7 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
       row.downButton.setEnabled(downEnabled);
       row.goButton.setShown(this.#editEnabled);
       row.goButton.setEnabled(this.#editEnabled);
+      row.fltButton.setEnabled(this.#editEnabled);
       this.#setArrow(row.upButton, true, upEnabled);
       this.#setArrow(row.downButton, true, downEnabled);
       this.#setRowChrome(row, true);
@@ -366,12 +380,13 @@ class HUDTourBuilderScreen extends ThreeMeshUI.Block {
     row.upButton.set({ borderOpacity, backgroundOpacity });
     row.downButton.set({ borderOpacity, backgroundOpacity });
     row.goButton.set({ borderOpacity, backgroundOpacity });
+    row.fltButton.set({ borderOpacity, backgroundOpacity });
   }
 
   static clipTitle(title) {
     const value = (title == null) ? '' : String(title);
-    if (value.length <= 32) return value;
-    return `${value.slice(0, 29)}...`;
+    if (value.length <= 22) return value;
+    return `${value.slice(0, 19)}...`;
   }
 
   /*

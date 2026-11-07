@@ -107,8 +107,9 @@ function createHudButton(world3d, options) {
       button.userData.hudMargin = button.margin || 0;
     }
     button.visible = shown;
+    // A width of 0 is ignored by three-mesh-ui (it falls back to the content size).
     button.set({
-      width: shown ? button.userData.hudWidth : 0,
+      width: shown ? button.userData.hudWidth : 0.0001,
       margin: shown ? button.userData.hudMargin : 0
     });
   };

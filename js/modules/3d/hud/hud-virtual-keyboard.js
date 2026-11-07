@@ -33,9 +33,15 @@ class HUDVirtualKeyboard extends Group {
   keyboard = null;
 
   #text = '';
+  #placeholder = 'STAGE TITLE';
+  #numeric = false;
   #onValidate = null;
+  #onInvalid = null;
+  #onHere = null;
+  #inputBlock = null;
   #inputText = null;
   #cancelButton = null;
+  #hereButton = null;
 
 
   /*
@@ -64,7 +70,7 @@ class HUDVirtualKeyboard extends Group {
     this.#styleKeys();
     this.add(this.keyboard);
 
-    const inputBlock = new ThreeMeshUI.Block({
+    this.#inputBlock = new ThreeMeshUI.Block({
       width: 0.36 * SCALE,
       height: 0.04 * SCALE,
       margin: 0,
@@ -89,9 +95,24 @@ class HUDVirtualKeyboard extends Group {
       offset: 0,
       fontSize: KEY_FONT_SIZE
     });
-    inputBlock.add(this.#inputText);
-    inputBlock.position.set(-0.07 * SCALE, 0.15 * SCALE, 0);
-    this.add(inputBlock);
+    this.#inputBlock.add(this.#inputText);
+    this.#inputBlock.position.set(-0.07 * SCALE, 0.15 * SCALE, 0);
+    this.add(this.#inputBlock);
+
+    this.#hereButton = createHudButton(world3d, {
+      width: 0.08 * SCALE,
+      height: 0.032 * SCALE,
+      label: 'HERE',
+      fontSize: KEY_FONT_SIZE,
+      margin: 0,
+      onClick: () => this.#applyHere()
+    });
+    this.#hereButton.set({
+      fontFamily: FONT_FAMILY,
+      fontTexture: FONT_TEXTURE
+    });
+    this.add(this.#hereButton);
+    this.#hereButton.setShown(false);
 
     this.#cancelButton = createHudButton(world3d, {
       width: 0.1 * SCALE,
@@ -192,16 +213,13 @@ class HUDVirtualKeyboard extends Group {
   #onKey(key) {
     const command = key.info.command;
     if (command == 'enter') {
-      const value = this.#text.trim();
-      const callback = this.#onValidate;
-      this.close();
-      if (callback && value.length > 0) callback(value);
+      this.#submit();
       return;
     }
     if (command == 'backspace') {
       this.#text = this.#text.slice(0, -1);
     } else if (command == 'space') {
-      this.#append(' ');
+      if (!this.#numeric) this.#append(' ');
     } else if (command == 'shift') {
       this.keyboard.toggleCase();
     } else if (command == 'switch') {
@@ -215,24 +233,77 @@ class HUDVirtualKeyboard extends Group {
     this.syncLayers();
   }
 
+  #submit() {
+    if (this.#numeric) {
+      const raw = this.#text.trim().replace(',', '.');
+      const value = Number(raw);
+      if (!/^-?\d+(\.\d+)?$/.test(raw) || !Number.isFinite(value)) {
+        if (this.#onInvalid) this.#onInvalid();
+        return;
+      }
+      const callback = this.#onValidate;
+      this.close();
+      if (callback) callback(value);
+      return;
+    }
+
+    const value = this.#text.trim();
+    const callback = this.#onValidate;
+    this.close();
+    if (callback && value.length > 0) callback(value);
+  }
+
   #append(value) {
+    if (this.#numeric) {
+      const next = this.#text + (value == ',' ? '.' : value);
+      if (next.length > 16) return;
+      if (!/^-?\d*\.?\d*$/.test(next)) return;
+      this.#text = next;
+      return;
+    }
     if (this.#text.length >= MAX_LENGTH) return;
     this.#text += value;
   }
 
+  /*
+   * HERE fills the field with the user's position. It does not submit.
+   */
+  #applyHere() {
+    if (!this.#onHere) return;
+    const value = this.#onHere();
+    if (!Number.isFinite(value)) return;
+    this.#text = HUDVirtualKeyboard.#plainNumber(value);
+    this.#refreshField();
+  }
+
+  static #plainNumber(value) {
+    const text = String(value);
+    if (!/[eE]/.test(text)) return text;
+    return value.toFixed(12).replace(/\.?0+$/, '');
+  }
+
   #refreshField() {
     this.#inputText.set({
-      content: this.#text.length > 0 ? this.#text : 'STAGE TITLE'
+      content: this.#text.length > 0 ? this.#text : this.#placeholder
     });
   }
 
   /*
-   * Ask for a stage title.
-   * callback receives the trimmed title.
+   * Ask for text, or for a number when options.numeric is set.
+   * callback receives the trimmed title, or a finite number.
+   * options.onHere, when set, shows HERE and fills the field with its result.
+   * options.onInvalid runs when a numeric entry cannot be parsed.
    */
-  open(callback) {
+  open(callback, options) {
+    const settings = options || {};
     this.#onValidate = callback;
-    this.#text = '';
+    this.#onInvalid = settings.onInvalid || null;
+    this.#onHere = settings.onHere || null;
+    this.#placeholder = settings.placeholder || 'STAGE TITLE';
+    this.#numeric = !!settings.numeric;
+    this.#text = settings.initialText == null ? '' : String(settings.initialText);
+    this.#showPanel(this.#numeric ? this.#numericPanelIndex() : 0);
+    this.#layoutHeader();
     this.#refreshField();
     this.visible = true;
     this.syncLayers();
@@ -241,8 +312,63 @@ class HUDVirtualKeyboard extends Group {
   close() {
     this.visible = false;
     this.#onValidate = null;
+    this.#onInvalid = null;
+    this.#onHere = null;
+    this.#numeric = false;
+    this.#placeholder = 'STAGE TITLE';
     this.#text = '';
+    this.#showPanel(0);
+    this.#layoutHeader();
     this.syncLayers();
+  }
+
+  /*
+   * Index of the .?12 panel. Layouts differ by language, so look for the digit row.
+   */
+  #numericPanelIndex() {
+    const panels = this.keyboard.panels;
+    for (let i = 0; i < panels.length; i++) {
+      const hasDigit = this.keyboard.keys.some(
+        (key) => key.panel == panels[i] && key.info.input == '1'
+      );
+      if (hasDigit) return i;
+    }
+    return 0;
+  }
+
+  /*
+   * Show one keyboard panel.
+   */
+  #showPanel(index) {
+    const panels = this.keyboard.panels;
+    if (index < 0 || index >= panels.length) return;
+    if (this.keyboard.currentPanel == index && panels[index].parent == this.keyboard) {
+      return;
+    }
+    for (const panel of panels) {
+      this.keyboard.remove(panel);
+    }
+    this.keyboard.currentPanel = index;
+    this.keyboard.add(panels[index]);
+    this.keyboard.update(true, true, true);
+  }
+
+  /*
+   * Leave room for HERE only while a position can be captured.
+   */
+  #layoutHeader() {
+    const here = this.#onHere != null;
+    this.#hereButton.setShown(here);
+    if (here) {
+      this.#inputBlock.set({ width: 0.28 * SCALE });
+      this.#inputBlock.position.set(-0.09 * SCALE, 0.15 * SCALE, 0);
+      this.#hereButton.position.set(0.105 * SCALE, 0.15 * SCALE, 0.001);
+      this.#cancelButton.position.set(0.205 * SCALE, 0.15 * SCALE, 0.001);
+      return;
+    }
+    this.#inputBlock.set({ width: 0.36 * SCALE });
+    this.#inputBlock.position.set(-0.07 * SCALE, 0.15 * SCALE, 0);
+    this.#cancelButton.position.set(0.2 * SCALE, 0.15 * SCALE, 0.001);
   }
 
   /*
@@ -271,6 +397,8 @@ class HUDVirtualKeyboard extends Group {
       });
     }
     this.#cancelButton.traverse((obj) => obj.layers.set(keyboardOpen ? 0 : 1));
+    const hereActive = keyboardOpen && this.#onHere != null;
+    this.#hereButton.traverse((obj) => obj.layers.set(hereActive ? 0 : 1));
   }
 
   /*
@@ -279,9 +407,13 @@ class HUDVirtualKeyboard extends Group {
   dispose() {
     this.world3d = null;
     this.keyboard = null;
+    this.#inputBlock = null;
     this.#inputText = null;
     this.#cancelButton = null;
+    this.#hereButton = null;
     this.#onValidate = null;
+    this.#onInvalid = null;
+    this.#onHere = null;
   }
 
 }
