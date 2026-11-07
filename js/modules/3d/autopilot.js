@@ -43,6 +43,7 @@ class Autopilot extends LineSegments {
   curve = null;
   enabled = false;
   isLoadingOk = false;
+  hasStageDescriptions = false;
   
   
 
@@ -117,8 +118,14 @@ class Autopilot extends LineSegments {
     for (let stage of tourDescriptor['stages']) {
       const pos = this.getWorld3dPosition(stage['coords']);
       if (pos == null) continue;
+      if ('desc' in stage) {
+        this.hasStageDescriptions = true;
+      }
       this.stages.push({
         'coords': pos,
+        'title': stage['title'],
+        'content': stage['desc'],
+        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null,
         'filters': 'filters' in stage ? stage['filters'] : null
       });
       path.push(pos);
@@ -228,6 +235,20 @@ class Autopilot extends LineSegments {
   }
 
   /*
+   * Display content related to a given stage of the trip 
+   */
+  displayStageDescription(idxSage) {
+    const stage = this.stages[idxSage];
+    const title = `${stage.title}`;
+    const content1 = `${stage.content}`;
+    const content2 = ``;
+    this.world3d.hud.leftScreen.displayMessage(title, content1, content2);
+    if (stage['audiofile'] != null) {
+      this.world3d.audioguide.loadAudio(stage['audiofile']);
+    }
+  }
+
+  /*
    * Position the probe at a given position 
    */
   setProbePosition(position) {
@@ -267,7 +288,9 @@ class Autopilot extends LineSegments {
         controller.pause();
         this.displayGoodByeMessage();
       } else {
-        this.displayProgressMessage(controller.effectiveTime, controller.totalDuration);
+        if (!this.hasStageDescriptions) {
+          this.displayProgressMessage(controller.effectiveTime, controller.totalDuration);
+        }
       }
     }
   }
@@ -288,14 +311,20 @@ class Autopilot extends LineSegments {
    * Move to next stage of the trip 
    */
   switchToNextStage() {
-    this.currentStage++;
     if (this.currentStage < this.stages.length) {
-      this.setProbePosition(this.stages[this.currentStage].coords);
-      this.world3d.pointsCloud.filterPointsCloud(this.stages[this.currentStage].filters);
+      this.setProbePosition(this.stages[this.currentStage+1].coords);
+      if (this.currentStage >= 0) {
+        if (this.stages[this.currentStage]['audiofile'] != null) {
+          this.world3d.audioguide.loadAudio(this.stages[this.currentStage]['audiofile']);
+        }
+        this.displayStageDescription(this.currentStage);
+        this.world3d.pointsCloud.filterPointsCloud(this.stages[this.currentStage].filters);
+      }
     } else {
       this.currentStage = -1;
       this.setProbePosition(POS_FARFAR_AWAY[0]);
     }
+    this.currentStage++;
   }
 
   /*
