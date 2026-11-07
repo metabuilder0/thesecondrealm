@@ -219,7 +219,55 @@
           <span class="underline">GO:</span> Teleports the dataship to the location of the stage.
         </li>
         <li>
+          <span class="underline">FLT:</span> Opens the filter editor for the stage.
+        </li>
+        <li>
           <span class="underline">DEL:</span> Removes the stage from the list.
+        </li>
+      </ul>
+
+      <p class="content">
+        The filter editor takes the place of the stage list. It edits the filters applied to the points cloud when the dataship reaches the stage.
+        A point stays visible when it matches at least one group (OR logical condition), and a group matches when the point lies inside every range of that group (AND logical condition).
+        The cloud updates with each change, so the result can be judged in place.
+      </p>
+
+      <p class="content">The bar at the bottom of the filter editor offers the following buttons:</p>
+
+      <ul>
+        <li>
+          <span class="underline">ADD GROUP:</span> Adds a group. A new group starts with one range covering the whole X axis, so every point still matches it until the bounds are narrowed.
+        </li>
+        <li>
+          <span class="underline">GO:</span> Teleports the dataship to the stage, which gives a view of the filter from the stage itself.
+        </li>
+        <li>
+          <span class="underline">BACK:</span> Closes the editor, returns to the stage list, and shows every point of the cloud again.
+        </li>
+      </ul>
+
+      <p class="content">Each group is a row labeled GROUP that carries the following buttons:</p>
+
+      <ul>
+        <li>
+          <span class="underline">+ RANGE:</span> Adds a range to the group. A new range covers a whole axis, so it leaves the cloud unchanged until its bounds are narrowed.
+        </li>
+        <li>
+          <span class="underline">DEL:</span> Removes the group. Removing the last group clears the filter of the stage.
+        </li>
+      </ul>
+
+      <p class="content">Each range is a row of its own:</p>
+
+      <ul>
+        <li>
+          <span class="underline">X, Y, Z or HEIGHT:</span> The axis of the range. The button cycles through the three data axes and HEIGHT, the block height, stored as "key" in the descriptor. Changing the axis resets the bounds to the full extent of the new axis.
+        </li>
+        <li>
+          <span class="underline">MIN and MAX:</span> The inclusive bounds, expressed in data values. Selecting a bound opens the virtual keyboard on its numeric keys. HERE fills the field with the value of the current position on the selected axis, and Enter confirms the number.
+        </li>
+        <li>
+          <span class="underline">DEL:</span> Removes the range. Removing the last range of a group removes the group.
         </li>
       </ul>
     </div>
