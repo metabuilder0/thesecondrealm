@@ -1,0 +1,10 @@
+import { fromB58, toB58 } from '../../../js/modules/utils/base58.js';
+const cur = '25auNqNZxi2Kn8SsDKPzMyP4cuam955kUwRRLCzXNuLtYNejLjLwPufadrsFiVXcPeASecyxoyX5oQwDkh5K7D9A9FqFN34Sri4tEC2zNzCBpSPCtYBBYgKvPjjqvCiuxbteJETtDX1bGACbtfpkScvcbkboqVFAeMueA9intDsRbWFBxR4JtkPJR5vf1pU3YA42LHQ792qPWeSJJDmcm9tdD148GceYHYE8HoX8QAB1Zsfebdx9tc7a6FUKjwRQTHzo9L15KJwAVqPNJRxzwfPj1CxhKVjTtYVwBTk4QfqQVJkcUiTn';
+const arr = JSON.parse(new TextDecoder().decode(fromB58(cur)));
+console.log(JSON.stringify(arr));
+arr[7] = [-210231, 8000, 13870];
+arr[8] = [0, -1.5531, 0];
+arr[10] = '/static/tours/spam_in_the_sky_2.json';
+const enc = toB58(new TextEncoder().encode(JSON.stringify(arr)));
+console.log(JSON.stringify(JSON.parse(new TextDecoder().decode(fromB58(enc)))));
+console.log(enc);
