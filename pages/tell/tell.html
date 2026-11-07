@@ -181,12 +181,12 @@
     <div class="paragraph-left">
       <h1 class="title">THE TOUR BUILDER</h1>
       <p class="content">
-        A Tour Builder is proposed on the left of the HUD when immersion is entered in builder mode. This tool allows to create and edit the stages composing the skeleton of the tour.
-        The panel lists the stages of the tour associated with the scene, or an empty circuit when none has been set.
+        The Tour Builder is a tool displayed on the left of the HUD when immersion is entered in builder mode. This tool allows to create and edit the stages composing the skeleton of the tour.
+        The panel lists the stages of the tour associated with the scene or an empty circuit when none has been set.
         From here the builder lays the stages, tries the journey, and carries the result back as a descriptor file.
       </p>
 
-      <p class="content">The bar above the list offers the following buttons:</p>
+      <p class="content">The button bar above the list offers the following actions:</p>
 
       <ul>
         <li>
@@ -199,10 +199,10 @@
           <span class="underline">ADD STAGE:</span> Adds a new stage to the tour. The current position is used for the coordinates of the stages and a virtual keyboard is used to enter the title of the stage.
         </li>
         <li>
-          <span class="underline">MODE:</span> Switches between EDIT AND TEST modes. TEST mode allows to test the tour without having to export the descriptor file. EDIT mode allows to edit the tour and export the descriptor file.
+          <span class="underline">MODE:</span> Switches between EDIT AND TEST modes. TEST mode allows to test the tour without having to export the descriptor file. EDIT mode allows to edit the tour.
         </li>
         <li>
-          <span class="underline">EXPORT:</span> Downloads the descriptor as a JSON file. If a tour file is already associated with the realm, the export keeps all its existing fields and applies the edits made in the panel.
+          <span class="underline">EXPORT:</span> Downloads the descriptor as a JSON file stored on the disk of the headset. If a tour file is already associated with the realm, the export keeps all its existing fields and applies the edits made in the panel.
         </li>
       </ul>
 
@@ -227,9 +227,9 @@
       </ul>
 
       <p class="content">
-        The filter editor takes the place of the stage list. It edits the filters applied to the points cloud when the dataship reaches the stage.
-        A point stays visible when it matches at least one group (OR logical condition), and a group matches when the point lies inside every range of that group (AND logical condition).
-        The cloud updates with each change, so the result can be judged in place.
+        The filter editor allows to edit the filters applied to the points cloud when the dataship reaches the stage.
+        A point stays visible when it matches at least one group (the groups composing a filter are connected by an OR logical condition), and a group matches when the point lies inside every range of that group (the ranges of a group are connected by AND logical conditions).
+        The points cloud updates with each change, so the result can be judged in place.
       </p>
 
       <p class="content">The bar at the bottom of the filter editor offers the following buttons:</p>
