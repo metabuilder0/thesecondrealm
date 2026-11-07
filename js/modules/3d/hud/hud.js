@@ -28,6 +28,8 @@ class HUD extends Group {
   helpScreen = null;
   tourBuilderPanel = null;
   isHelpScreenOpen = false;
+  // Set when immersion is entered in builder mode. It does not follow TEST/EDIT.
+  builderMode = false;
 
   /*
    * Constructor 
@@ -101,6 +103,7 @@ class HUD extends Group {
    * Show the tour builder. descriptor is null when the scene has no tour.
    */
   activateTourBuilder(descriptor, sceneParams) {
+    this.builderMode = true;
     this.tourBuilderPanel.activate(descriptor, sceneParams);
   }
 
