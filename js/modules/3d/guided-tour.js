@@ -129,7 +129,8 @@ class GuidedTour extends LineSegments {
         'coords': pos,
         'title': stage['title'],
         'content': stage['desc'],
-        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null
+        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null,
+        'filters': 'filters' in stage ? stage['filters'] : null
       });
       path.push(pos);
     }
@@ -307,6 +308,7 @@ class GuidedTour extends LineSegments {
       }
       this.displayStageDescription(this.currentStage);
       this.setProbePosition(this.stages[this.currentStage].coords);
+      this.world3d.pointsCloud.filterPointsCloud(this.stages[this.currentStage].filters);
     } else {
       this.currentStage = -1;
       this.setProbePosition(POS_FARFAR_AWAY[0]);

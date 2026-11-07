@@ -16,6 +16,7 @@ class PointsCloud extends Points {
    */
   static POINT_SIZE = 0.01;
   static ALPHA = 0.7;
+  static ALPHA_INVISIBLE = 0;
 
   // HSL factors
   static FACTOR_H = 0;
@@ -34,7 +35,10 @@ class PointsCloud extends Points {
 
   // Data cached for animations
   animIdx = 0;
-  nbPoints = 0
+  nbPoints = 0;
+
+  // Incremental filter job (processed in update() to keep the UI responsive)
+  #filterJob = null;
 
 
   /*
@@ -82,8 +86,11 @@ class PointsCloud extends Points {
           y = factorY * (cloudData.dataPoints[i]['y'] - this.cloudData.minY),
           z = factorZ * (cloudData.dataPoints[i]['z'] - this.cloudData.minZ),
           key = cloudData.dataPoints[i]['key'],
-          color = this.#computeColor(x, y, z, key);
-      colorAttribute.setXYZW(i, color.r, color.g, color.b, PointsCloud.ALPHA);
+          color = this.#computeColor(x, y, z, key),
+          alpha = (color.r == 0 && color.g == 0 && color.b == 0)
+            ? PointsCloud.ALPHA_INVISIBLE
+            : PointsCloud.ALPHA;
+      colorAttribute.setXYZW(i, color.r, color.g, color.b, alpha);
       posAttribute.setXYZW(i, x, y, z, key);
     }
     this.geometry.getAttribute('position').needsUpdate = true;
@@ -125,6 +132,37 @@ class PointsCloud extends Points {
    * Animate the PointCLoud
    */
   update(delta) {
+    this.#processFilterChunk();
+    this.#processAnimation();
+  }
+
+  /*
+   * Compute the color of a point
+   */
+  #computeColor(x, y, z, key) {
+    let color = new Color();
+    // Checks coordinates are valid integers
+    if (isNaN(x)) { x = 0; }
+    if (isNaN(y)) { y = 0; }
+    if (isNaN(z)) { z = 0; }
+    if ( (key >= this.highlightFrom) && (key <= this.highlightTo) ) {
+      // Visible vertex
+      color.setHSL(
+        0.75 - Math.max(0, y) * PointsCloud.FACTOR_H, 
+        0.5  + Math.max(0, z) * PointsCloud.FACTOR_S, 
+        0.33 + Math.max(0, x) * PointsCloud.FACTOR_L
+      );
+    } else {
+      // "Invisible" point
+      color.setHSL(0, 0, 0);
+    }
+    return color;
+  }
+
+  /*
+   * Process the animation of the PointsCloud
+   */
+  #processAnimation() {
     const animLag = 2016;
     const iterSize = 18;
     
@@ -163,7 +201,8 @@ class PointsCloud extends Points {
               z = posAttribute.getZ(idx),
               key = posAttribute.getW(idx);
         const color = this.#computeColor(x, y, z, key);
-        this.geometry.getAttribute('color').setXYZW(idx, color.r, color.g, color.b, PointsCloud.ALPHA);
+        const alpha = PointsCloud.ALPHA;
+        this.geometry.getAttribute('color').setXYZW(idx, color.r, color.g, color.b, alpha);
       }
     }
 
@@ -172,27 +211,77 @@ class PointsCloud extends Points {
     this.animIdx += iterSize;
   }
 
-  /*
-   * Compute the color of a point
+  /**
+   * Filter the points cloud to keep only the points within bounds defined by a collection of filters.
+   * Starts (or replaces) an incremental job processed in update() so the main thread can keep rendering.
    */
-  #computeColor(x, y, z, key) {
-    let color = new Color();
-    // Checks coordinates are valid integers
-    if (isNaN(x)) { x = 0; }
-    if (isNaN(y)) { y = 0; }
-    if (isNaN(z)) { z = 0; }
-    if ( (key >= this.highlightFrom) && (key <= this.highlightTo) ) {
-      // Visible vertex
-      color.setHSL(
-        0.75 - Math.max(0, y) * PointsCloud.FACTOR_H, 
-        0.5  + Math.max(0, z) * PointsCloud.FACTOR_S, 
-        0.33 + Math.max(0, x) * PointsCloud.FACTOR_L
-      );
-    } else {
-      // "Invisible" point
-      color.setHSL(0, 0, 0.05);
+  filterPointsCloud(filters) {
+    if (!this.cloudData) return;
+    this.#filterJob = {
+      filters,
+      index: 0,
+      total: this.cloudData.dataPoints.length
+    };
+  }
+
+  /*
+   * Apply the current filter to a time-sliced batch of points.
+   * ~6ms per frame leaves room for XR rendering and HUD updates.
+   */
+  #processFilterChunk() {
+    const job = this.#filterJob;
+    if (!job) return;
+
+    const colorAttribute = this.geometry.getAttribute('color');
+    const deadline = performance.now() + 6;
+
+    while (job.index < job.total && performance.now() < deadline) {
+      const i = job.index++;
+      const alpha = this.#isPointHidden(i, job.filters)
+        ? PointsCloud.ALPHA_INVISIBLE
+        : PointsCloud.ALPHA;
+      colorAttribute.setW(i, alpha);
     }
-    return color;
+
+    colorAttribute.needsUpdate = true;
+
+    if (job.index >= job.total) {
+      this.#filterJob = null;
+    }
+  }
+
+  /*
+   * Check if a point is hidden by a collection of filters
+   */
+  #isPointHidden(idx, filters) {
+    if (filters == null || filters.length == 0)
+      return false;
+
+    for (let i=0; i < filters.length; i++) {
+      let hidden = false;
+
+      for (let j=0; j < filters[i].length; j++) {
+      
+        const isLogScale = (this.cloudData.scaleX == data.SCALE_LOG && filters[i][j][0] == 'x') 
+          || (this.cloudData.scaleY == data.SCALE_LOG && filters[i][j][0] == 'y') 
+          || (this.cloudData.scaleZ == data.SCALE_LOG && filters[i][j][0] == 'z');
+      
+        let lowerBound = isLogScale ? Math.log10(filters[i][j][1]) : filters[i][j][1];
+        let upperBound = isLogScale ? Math.log10(filters[i][j][2]) : filters[i][j][2];       
+        let value = this.cloudData.dataPoints[idx][filters[i][j][0]];
+
+        if (value < lowerBound || value > upperBound) {
+          hidden = true;
+        }
+      }
+
+      if (!hidden) {
+        return false;
+      }
+
+    }
+
+    return true;
   }
 
   /*

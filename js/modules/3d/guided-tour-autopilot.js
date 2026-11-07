@@ -81,7 +81,8 @@ class GuidedTourAutopilot extends GuidedTour {
         'coords': pos,
         'title': stage['title'],
         'content': stage['desc'],
-        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null
+        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null,
+        'filters': 'filters' in stage ? stage['filters'] : null
       });
 
       path.push(pos);
