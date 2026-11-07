@@ -57,14 +57,20 @@ class HUDTourBuilderPanel extends Group {
     this.menu.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 9);
     this.add(this.menu);
 
-    // Same pitch as the screen, just under its bottom edge and closer
-    // to the user so it sits in front of the panel.
-    this.keyboard = new HUDVirtualKeyboard(world3d);
+    // The keyboard is built on first use. Creating it here lays out every
+    // key at startup and keeps the other HUD panels invisible until that finishes.
+    this.keyboard = null;
+
+    this.visible = false;
+  }
+
+  #ensureKeyboard() {
+    if (this.keyboard) return this.keyboard;
+    this.keyboard = new HUDVirtualKeyboard(this.world3d);
     this.keyboard.position.set(0, -0.133, 0.270);
     this.keyboard.rotateOnAxis(new Vector3(1, 0, 0), -Math.PI / 3);
     this.add(this.keyboard);
-
-    this.visible = false;
+    return this.keyboard;
   }
 
   /*
@@ -89,7 +95,7 @@ class HUDTourBuilderPanel extends Group {
     if (this.mode != 'edit' || !this.tourEditor) return;
     const position = this.world3d.camera.parent.position;
     this.#pendingPosition = [position.x, position.y, position.z];
-    this.keyboard.open((title) => {
+    this.#ensureKeyboard().open((title) => {
       const added = this.tourEditor.addStage(
         title,
         this.#pendingPosition,
@@ -131,7 +137,7 @@ class HUDTourBuilderPanel extends Group {
   openFilters(index) {
     if (this.mode != 'edit' || !this.tourEditor) return;
     if (!this.tourEditor.stages[index]) return;
-    this.keyboard.close();
+    if (this.keyboard) this.keyboard.close();
     this.#filterStageIndex = index;
     this.screen.visible = false;
     this.filterScreen.show(index);
@@ -222,7 +228,7 @@ class HUDTourBuilderPanel extends Group {
     const current = this.#filterCondition(stageIndex, groupIndex, conditionIndex);
     if (!current) return;
     const bound = which == 'max' ? current[2] : current[1];
-    this.keyboard.open((value) => {
+    this.#ensureKeyboard().open((value) => {
       const latest = this.#filterCondition(stageIndex, groupIndex, conditionIndex);
       if (!latest) return;
       let min = which == 'min' ? value : latest[1];
@@ -410,7 +416,7 @@ class HUDTourBuilderPanel extends Group {
     const descriptor = this.tourEditor.toJSON();
 
     this.mode = 'test';
-    this.keyboard.close();
+    if (this.keyboard) this.keyboard.close();
     this.screen.setEditEnabled(false);
     this.menu.refresh();
     this.world3d.tourExitHandler = () => this.#enterEdit();
@@ -445,7 +451,7 @@ class HUDTourBuilderPanel extends Group {
    */
   updatePanel() {
     this.#syncLayers();
-    this.keyboard.syncLayers();
+    if (this.keyboard) this.keyboard.syncLayers();
   }
 
   #previewFilters() {
@@ -581,7 +587,7 @@ class HUDTourBuilderPanel extends Group {
    * Dispose the object
    */
   dispose() {
-    this.keyboard.dispose();
+    if (this.keyboard) this.keyboard.dispose();
     this.screen.dispose();
     this.filterScreen.dispose();
     this.menu.dispose();

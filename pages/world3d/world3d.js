@@ -199,14 +199,15 @@ const world3dScript = {
       
       world3dScript.world3d.soundSystem.loadMusic(song);
 
-      let descriptor = null;
-      if (sceneParams.tour) {
-        try {
-          descriptor = await dataStore.getTourDescriptorFile(sceneParams.tour);
-        } catch (e) {
+      const tourPromise = sceneParams.tour
+        ? dataStore.getTourDescriptorFile(sceneParams.tour).catch((e) => {
           console.log(e);
-        }
-      }
+          return null;
+        })
+        : null;
+      // Paint the compass and the main screens before building the tour panel.
+      await world3dScript.world3d.hud.whenRendered();
+      const descriptor = tourPromise ? await tourPromise : null;
       world3dScript.world3d.hud.activateTourBuilder(descriptor, sceneParams);
 
     } else {
