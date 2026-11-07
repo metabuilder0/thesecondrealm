@@ -27,19 +27,23 @@ class Autopilot extends LineSegments {
    * Attributes
    */
 
-  #refreshCumulWait = 0;
-  #audioIntroPath = '';
-  #audioOutroPath = '';
-
   world3d = null;
 
   version = null;
   title = null;
   coordTypes = null;
   stages = [];
+  
+  currentStage = -1;
+
+  #refreshCumulWait = 0;
+  #audioIntroPath = '';
+  #audioOutroPath = '';
+
   curve = null;
   enabled = false;
   isLoadingOk = false;
+  hasStageDescriptions = false;
   
   
 
@@ -49,7 +53,13 @@ class Autopilot extends LineSegments {
   constructor(world3d) {
     const geometry = new BoxGeometry(1000, 1000, 1000);
     const edgesGeometry = new EdgesGeometry(geometry);
-    const material = new LineBasicMaterial({ color: 0x590000 });
+    // Creates a material for the autopilot line
+    const material = new LineBasicMaterial({
+      color: 0x000000,
+      opacity: 0,
+      transparent: true
+    });
+
     super(edgesGeometry, material);
 
     this.setProbePosition(POS_FARFAR_AWAY[0]);
@@ -107,9 +117,17 @@ class Autopilot extends LineSegments {
     // Builds the tour and the path
     for (let stage of tourDescriptor['stages']) {
       const pos = this.getWorld3dPosition(stage['coords']);
-      if (pos == null)
-        continue;
-      this.stages.push({'coords': pos});
+      if (pos == null) continue;
+      if ('desc' in stage) {
+        this.hasStageDescriptions = true;
+      }
+      this.stages.push({
+        'coords': pos,
+        'title': stage['title'],
+        'content': stage['desc'],
+        'audiofile': 'audiofile' in stage ? stage['audiofile'] : null,
+        'filters': 'filters' in stage ? stage['filters'] : null
+      });
       path.push(pos);
     }
 
@@ -137,7 +155,12 @@ class Autopilot extends LineSegments {
     if (!this.isLoadingOk) return;
     // Deactivates the selection tool during the tour
     this.world3d.selectionHelper.isActive = false; 
+    // Displays the introductory message
     this.displayIntroductoryMessage();
+    // Moves the probe to the initial position
+    if (this.initialPosition != null) {
+      this.setProbePosition(this.initialPosition);
+    }
   } 
 
   /*
@@ -212,6 +235,20 @@ class Autopilot extends LineSegments {
   }
 
   /*
+   * Display content related to a given stage of the trip 
+   */
+  displayStageDescription(idxSage) {
+    const stage = this.stages[idxSage];
+    const title = `${stage.title}`;
+    const content1 = `${stage.content}`;
+    const content2 = ``;
+    this.world3d.hud.leftScreen.displayMessage(title, content1, content2);
+    if (stage['audiofile'] != null) {
+      this.world3d.audioguide.loadAudio(stage['audiofile']);
+    }
+  }
+
+  /*
    * Position the probe at a given position 
    */
   setProbePosition(position) {
@@ -228,19 +265,66 @@ class Autopilot extends LineSegments {
     if (!this.isLoadingOk) return;
     this.#refreshCumulWait += delta;
     if (this.#refreshCumulWait > 0.1) {
-      // Pauses the tour if we're less than 5s from the end of the tour
-      const controller = this.world3d.controller;
-      const remainingDuration = controller.totalDuration - controller.effectiveTime;
-      if (controller.isRunning()) {
-        if (remainingDuration < 10000) {
-          controller.pause();
-          this.displayGoodByeMessage();
-        } else {
-          this.displayProgressMessage(controller.effectiveTime, controller.totalDuration);
-        }
+      this.#processTourProgress(delta);
+      // Checks our distance to the probe
+      if (this.getDistanceToProbe() <= 1000) {
+        // Moves the probe to the next stage of the trip
+        // and displays the associated description
+        this.switchToNextStage();
       }
       this.#refreshCumulWait = 0.0;
     }
+  }
+
+  /*
+   * Process tour progress
+   */
+  #processTourProgress(delta) {
+    // Pauses the tour if we're less than 5s from the end of the tour
+    const controller = this.world3d.controller;
+    const remainingDuration = controller.totalDuration - controller.effectiveTime;
+    if (controller.isRunning()) {
+      if (remainingDuration < 10000) {
+        controller.pause();
+        this.displayGoodByeMessage();
+      } else {
+        if (!this.hasStageDescriptions) {
+          this.displayProgressMessage(controller.effectiveTime, controller.totalDuration);
+        }
+      }
+    }
+  }
+
+  /*
+   * Compute the distance
+   * between the probe and the camera 
+   */
+  getDistanceToProbe() {
+    let cameraPos = new Vector3();
+    this.world3d.camera.parent.getWorldPosition(cameraPos);
+    let probePos = new Vector3();
+    this.getWorldPosition(probePos);
+    return cameraPos.distanceTo(probePos);
+  }
+
+  /*
+   * Move to next stage of the trip 
+   */
+  switchToNextStage() {
+    if (this.currentStage < this.stages.length) {
+      this.setProbePosition(this.stages[this.currentStage+1].coords);
+      if (this.currentStage >= 0) {
+        if (this.stages[this.currentStage]['audiofile'] != null) {
+          this.world3d.audioguide.loadAudio(this.stages[this.currentStage]['audiofile']);
+        }
+        this.displayStageDescription(this.currentStage);
+        this.world3d.pointsCloud.filterPointsCloud(this.stages[this.currentStage].filters);
+      }
+    } else {
+      this.currentStage = -1;
+      this.setProbePosition(POS_FARFAR_AWAY[0]);
+    }
+    this.currentStage++;
   }
 
   /*

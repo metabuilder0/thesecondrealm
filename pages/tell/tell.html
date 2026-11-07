@@ -65,6 +65,17 @@
           </li>
           <li><span class="underline">title:</span> The name or title of the stage.</li>
           <li><span class="underline">desc:</span> The content associated with the stage.</li>
+          <li>
+            <span class="underline">filters (optional):</span> Filters applied when the stage is reached, hiding points of the cloud that fall outside the given bounds. Value should be an array of groups. A point stays visible if it matches at least one group.
+            <ul>
+              <li>
+                Each group is an array of constraints of the form ["x"|"y"|"z", min, max]. A point matches a group if its data values lie within all of these inclusive ranges.
+              </li>
+              <li>
+                Bounds are expressed in data values. If an axis uses a logarithmic scale, the bounds are converted automatically.
+              </li>
+            </ul>
+          </li>
         </ul>
       </p>
     </div>
@@ -86,8 +97,8 @@
       <div class="paragraph-left">
         <h1 class="title">INTRODUCTION TO AUTOMATED WANDERINGS</h1>
         <p class="content">Not every ballad requires words. Sometimes the beauty of the landscape tells its own story.</p>
-        <p class="content">An automated wandering consists of an ordered set of waypoints.</p>
-        <p class="content">Together, they create a circuit that the dataship follows automatically.</p>
+        <p class="content">An automated wandering consists of an ordered set of waypoints. Together, they create a circuit that the dataship follows automatically.</p>
+        <p class="content">Each waypoint can optionally carry a short story—a title, a text, and an audio clip—displayed when the dataship reaches it.</p>
       </div>
     </div>
 
@@ -96,7 +107,8 @@
         <h1 class="title">DESCRIPTOR FILES FORMAT</h1>
         <p class="content">
           An automated wandering is defined by a descriptor file in JSON format, associated with the realm by its builder during configuration. 
-          An example of a descriptor file can be found <a href="/static/tours/borealis_1.json" target="_blank">here</a>.
+          An example of a descriptor file with waypoints only can be found <a href="/static/tours/borealis_1.json" target="_blank">here</a>.
+          An example with text, audio and filters at each stage can be found <a href="/static/tours/bitcoin_tsunami_1_autopilot_filters.json" target="_blank">here</a>.
         </p>
 
         <p class="content">The structure of all descriptor files follows this format:</p>
@@ -130,6 +142,26 @@
           <ul>
             <li>
               <span class="underline">coords:</span> The coordinates of the waypoint. The format depends on the "coords_type" value.
+            </li>
+            <li>
+              <span class="underline">title (optional):</span> The name or title of the stage.
+            </li>
+            <li>
+              <span class="underline">desc (optional):</span> The content associated with the stage. If at least one stage defines a description, the HUD displays that content when the stage is reached, instead of the remaining-time progress message.
+            </li>
+            <li>
+              <span class="underline">audiofile (optional):</span> URL of an audio clip played when the stage is reached.
+            </li>
+            <li>
+              <span class="underline">filters (optional):</span> Filters applied when the stage is reached, hiding points of the cloud that fall outside the given bounds. Value should be an array of groups. A point stays visible if it matches at least one group.
+              <ul>
+                <li>
+                  Each group is an array of constraints of the form ["x"|"y"|"z", min, max]. A point matches a group if its data values lie within all of these inclusive ranges.
+                </li>
+                <li>
+                  Bounds are expressed in data values. If an axis uses a logarithmic scale, the bounds are converted automatically.
+                </li>
+              </ul>
             </li>
           </ul>
         </p>
