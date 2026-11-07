@@ -36,14 +36,22 @@ class GuidedTourAutopilot extends GuidedTour {
    * Load the descriptor file 
    */
   async load(url) {
-    this.isLoadingOk = false;
-    const path = [];
-
     const tourDescriptor = await dataStore.getTourDescriptorFile(url);
     if (!tourDescriptor) {
       return []; 
     }
-    
+    return this.loadDescriptor(tourDescriptor);
+  }
+
+  /*
+   * Build the tour from an already loaded descriptor.
+   */
+  loadDescriptor(tourDescriptor) {
+    this.isLoadingOk = false;
+    this.stages = [];
+    this.currentStage = -1;
+    const path = [];
+
     this.title = tourDescriptor['title'];
     this.version = tourDescriptor['version'];
     this.coordTypes = tourDescriptor['coords_type'];
@@ -123,7 +131,9 @@ class GuidedTourAutopilot extends GuidedTour {
    */
   exit() {
     this.exitTimeout = setTimeout(() => {
-      this.world3d.xrManager.endSession();
+      if (this.world3d) {
+        this.world3d.onTourExit();
+      }
     }, 4000);
   }
 

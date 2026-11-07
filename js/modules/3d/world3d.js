@@ -58,6 +58,10 @@ class World3D {
   // Boolean flag indicating if loading has completed
   immersionModeActivated = false;
 
+  // Replaces the default "end the session" behavior when a tour finishes.
+  // The tour builder uses it to return to edition mode.
+  tourExitHandler = null;
+
 
   /*
    * Constructor
@@ -104,7 +108,20 @@ class World3D {
    * Initialize the controller
    */
   #initController() {
-    if (this.tourType == 'autopilot' || this.tourType == 'guided_tour_autopilot') {
+    this.setController(this.tourType);
+  }
+
+  /*
+   * Replace the locomotion controller.
+   * Autopilot tour types follow a path; every other mode flies freely.
+   */
+  setController(tourType) {
+    if (this.controller) {
+      this.controller.dispose();
+      this.controller = null;
+    }
+    this.tourType = tourType;
+    if (tourType == 'autopilot' || tourType == 'guided_tour_autopilot') {
       this.controller = new AutopilotController(this);
     } else {
       this.controller = new FlyController(this);
@@ -231,6 +248,90 @@ class World3D {
     }
   }
 
+  /*
+   * End of a tour.
+   * Explorer mode leaves the immersion. A tourExitHandler (builder test
+   * mode) runs instead of ending the session.
+   */
+  onTourExit() {
+    if (this.tourExitHandler) {
+      const handler = this.tourExitHandler;
+      this.tourExitHandler = null;
+      handler();
+      return;
+    }
+    this.xrManager.endSession();
+  }
+
+  /*
+   * Play a tour described by an in-memory descriptor.
+   * Returns false when the descriptor cannot be started.
+   */
+  startTourFromDescriptor(descriptor) {
+    this.#clearTour();
+    this.setController(descriptor['type']);
+    if (this.audioguide == null) {
+      this.#initAudioguide();
+    }
+    this.initTour();
+    if (!this.tour) return false;
+
+    const path = this.tour.loadDescriptor(descriptor);
+    if (!this.tour.isLoadingOk) return false;
+
+    const followsPath = descriptor['type'] == 'autopilot'
+      || descriptor['type'] == 'guided_tour_autopilot';
+    if (followsPath) {
+      if (!path || path.length < 2) return false;
+      this.controller.loadPath(path);
+    }
+
+    this.tour.start();
+    return true;
+  }
+
+  /*
+   * Leave the running tour and restore free flight.
+   */
+  stopTour() {
+    this.tourExitHandler = null;
+    this.#clearTour();
+    this.setController(null);
+  }
+
+  /*
+   * Remove the current tour without touching the controller.
+   */
+  #clearTour() {
+    if (this.tour) {
+      if (
+        this.controller
+        && (this.tourType == 'guided_tour_autopilot' || this.tourType == 'autopilot')
+      ) {
+        this.controller.removeEventListener(
+          'resume',
+          this.tour.displayOnTheMoveMessage.bind(this.tour)
+        );
+        this.controller.removeEventListener(
+          'completed',
+          this.tour.onTourComplete.bind(this.tour)
+        );
+      }
+      this.scene.remove(this.tour);
+      this.tour.dispose();
+      this.tour = null;
+    }
+    if (this.audioguide) {
+      this.audioguide.stop();
+    }
+    if (this.pointsCloud) {
+      this.pointsCloud.filterPointsCloud(null);
+    }
+    if (this.selectionHelper) {
+      this.selectionHelper.isActive = true;
+    }
+  }
+
   /**
    * Display a PointsCloud
    */
@@ -261,6 +362,7 @@ class World3D {
    */
   dispose() {
     this.immersionModeActivated = false;
+    this.tourExitHandler = null;
     // Removes the event listeners 
     this.xrManager.removeEventListener(
       'sessionstart', 

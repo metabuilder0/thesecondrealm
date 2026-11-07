@@ -9,6 +9,7 @@ import { HUDLeftScreen } from './hud-left-screen.js';
 import { HUDRightScreen } from './hud-right-screen.js';
 import { HUDRightMenu } from './hud-right-menu.js';
 import { HUDHelpScreen } from './hud-help-screen.js';
+import { HUDTourBuilderPanel } from './hud-tour-builder-panel.js';
 import { Compass } from './compass.js';
 
 
@@ -25,6 +26,7 @@ class HUD extends Group {
   rightMenu = null;
   #compass = null;
   helpScreen = null;
+  tourBuilderPanel = null;
   isHelpScreenOpen = false;
 
   /*
@@ -73,6 +75,15 @@ class HUD extends Group {
     this.isHelpScreenOpen = false;
     this.add(this.helpScreen);
 
+    // Left of the user, yawed inward, same pitch as the other screens.
+    // The panel's bottom-right corner stays at the left screen's height,
+    // 1.5 cm to its left and 2 cm closer to the user.
+    this.tourBuilderPanel = new HUDTourBuilderPanel(world3d, this);
+    this.tourBuilderPanel.position.set(-0.521, 0.854, -0.334);
+    this.tourBuilderPanel.rotation.y = 50 * Math.PI / 180;
+    this.tourBuilderPanel.visible = false;
+    this.add(this.tourBuilderPanel);
+
     // Links the HUD to the camera's parent group
     this.position.z = -1000000
     this.world3d.camera.parent.add(this);
@@ -84,6 +95,13 @@ class HUD extends Group {
   activate() {
     this.position.z = 0;
     this.leftScreen.clearLoadingText();
+  }
+
+  /*
+   * Show the tour builder. descriptor is null when the scene has no tour.
+   */
+  activateTourBuilder(descriptor, sceneParams) {
+    this.tourBuilderPanel.activate(descriptor, sceneParams);
   }
 
   /*
@@ -117,6 +135,8 @@ class HUD extends Group {
     try {
       ThreeMeshUI.update();
       this.rightMenu.updateMenu(delta);
+      // After three-mesh-ui, so meshes created this frame pick up the layer.
+      this.tourBuilderPanel.updatePanel();
     } catch {
       //
     }
@@ -132,6 +152,7 @@ class HUD extends Group {
     this.rightMenu.dispose();
     this.#compass.dispose();
     this.helpScreen.dispose();
+    this.tourBuilderPanel.dispose();
     // Resets the references to others objects
     this.world3d = null;
     this.leftScreen = null;
@@ -139,6 +160,7 @@ class HUD extends Group {
     this.rightMenu = null;
     this.#compass = null;
     this.helpScreen = null;
+    this.tourBuilderPanel = null;
   }
 
 }

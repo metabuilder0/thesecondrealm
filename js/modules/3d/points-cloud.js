@@ -334,11 +334,69 @@ class PointsCloud extends Points {
           diffY = this.cloudData.maxY - this.cloudData.minY,
           diffZ = this.cloudData.maxZ - this.cloudData.minZ;
 
-    const factorX = (diffX == 0) ? 0 : this.planeSize / diffX,
-          factorY = (diffY == 0) ? 0 : this.planeSize / diffY,
-          factorZ = (diffZ == 0) ? 0 : this.planeSize / diffZ;
+    const factorX = (diffX == 0) ? 0 : 1.0 * this.planeSize / diffX,
+          factorY = (diffY == 0) ? 0 : 1.0 * this.planeSize / diffY,
+          factorZ = (diffZ == 0) ? 0 : 1.0 * this.planeSize / diffZ;
     
-          return [factorX, factorY, factorZ];
+    return [factorX, factorY, factorZ];
+  }
+
+  /*
+   * Inverse of rawDataToCoords3d.
+   * Returns data-series coordinates,
+   * or null when the cloud is not ready.
+   */
+  coords3dToRawData(coords) {
+    if (!this.cloudData || coords == null) return null;
+
+    const [factorX, factorY, factorZ] = this.getHomothetyFactors();
+    const axes = [
+      [coords[0], factorX, this.cloudData.minX, this.cloudData.scaleX],
+      [coords[1], factorY, this.cloudData.minY, this.cloudData.scaleY],
+      [coords[2], factorZ, this.cloudData.minZ, this.cloudData.scaleZ]
+    ];
+
+    const result = [];
+    for (const [value, factor, min, scale] of axes) {
+      const dataValue = factor ? (1.0 * value / factor + min) : min;
+      const raw = (scale == data.SCALE_LOG) ? Math.pow(10, dataValue) : dataValue;
+      if (!Number.isFinite(raw)) return null;
+      //result.push(Math.round(raw));
+      result.push(raw);
+    }
+    return result;
+  }
+
+  /*
+   * Inverse of heightToCoords3d.
+   * Returns the block height of the data point nearest to the given
+   * world position, or null when the cloud is empty.
+   */
+  coords3dToHeight(coords) {
+    if (!this.cloudData || coords == null || this.cloudData.dataPoints.length == 0) {
+      return null;
+    }
+
+    const [factorX, factorY, factorZ] = this.getHomothetyFactors();
+    const x = factorX ? 1.0 * coords[0] / factorX + this.cloudData.minX : this.cloudData.minX;
+    const y = factorY ? 1.0 * coords[1] / factorY + this.cloudData.minY : this.cloudData.minY;
+    const z = factorZ ? 1.0 * coords[2] / factorZ + this.cloudData.minZ : this.cloudData.minZ;
+
+    let best = null;
+    let bestDistance = Infinity;
+    const points = this.cloudData.dataPoints;
+    for (let i = 0; i < points.length; i++) {
+      const point = points[i];
+      const dx = point.x - x;
+      const dy = point.y - y;
+      const dz = point.z - z;
+      const distance = dx * dx + dy * dy + dz * dz;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = point;
+      }
+    }
+    return best ? best.key : null;
   }
 
   /*
