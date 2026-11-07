@@ -99,6 +99,10 @@ const world3dScript = {
       sceneParams.boundaries
     );
     world3dScript.world3d.xrManager.addEventListener(
+      'userleft', 
+      world3dScript.onUserLeft.bind(world3dScript)
+    );
+    world3dScript.world3d.xrManager.addEventListener(
       'sessionend', 
       world3dScript.endImmersion.bind(world3dScript)
     );
@@ -233,6 +237,15 @@ const world3dScript = {
       goToPage('#kiosk');
     } else {
       goToPage('#configurator');
+    }
+  },
+
+  /*
+   * onUserLeft event handler
+   */
+  onUserLeft: () => {
+    if (sessionStorage.getItem('appMode') == APP_MODE_KIOSK) {
+      sessionStorage.removeItem('sectionKiosk');
     }
   },
 

@@ -6,12 +6,80 @@ const kioskScript = {
 
   NB_CARDS_PER_ROW: 3,
 
+  SECTIONS: [
+    '#kiosk-div1',
+    '#kiosk-div2',
+    '#kiosk-div3',
+    '#kiosk-div4'
+  ],
+
+
+  /*
+   * Attributes
+   */
+
+  // Flag indicating if section 2 should be displayed
+  _showIntroSection: false,
+
+  // Flag indicating if section 3 should be displayed
+  _showNavigationSection: false,
+
 
   /**
    * Init the page
    */
   initPage: () => {
-    //
+    // Sets the event handlers
+    document.addEventListener('visibilitychange', kioskScript.onvisibilitychange);
+
+    document.querySelector('#enter-tsr-btn').addEventListener(
+      'click', (e) => {
+        e.preventDefault();
+        if (kioskScript._showIntroSection) {
+          kioskScript.goToSection('#kiosk-div2');
+        } else if (kioskScript._showNavigationSection) {
+          kioskScript.goToSection('#kiosk-div3');
+        } else {
+          kioskScript.goToSection('#kiosk-div4');
+        }
+      }
+    );
+
+    document.querySelector('#next-btn').addEventListener(
+      'click', (e) => {
+        e.preventDefault();
+        if (kioskScript._showNavigationSection) {
+          kioskScript.goToSection('#kiosk-div3');
+        } else {
+          kioskScript.goToSection('#kiosk-div4');
+        }
+      }
+    );
+    
+    // document.querySelector('#prev-btn').addEventListener(
+    //   'click', (e) => {
+    //     e.preventDefault();
+    //     kioskScript.goToSection('#kiosk-div1');
+    //   }
+    // );
+    
+    document.querySelector('#next2-btn').addEventListener(
+      'click', (e) => {
+        e.preventDefault();
+        kioskScript.goToSection('#kiosk-div4');
+      }
+    );
+    
+    document.querySelector('#prev2-btn').addEventListener(
+      'click', (e) => {
+        e.preventDefault();
+        if (kioskScript._showIntroSection) {
+          kioskScript.goToSection('#kiosk-div2');
+        } else {
+          kioskScript.goToSection('#kiosk-div1');
+        }
+      }
+    );
   },
 
   /**
@@ -26,6 +94,51 @@ const kioskScript = {
     }
     // Loads the kiosk
     await kioskScript.loadKiosk();
+    // Sets the active section to home if no active section defined 
+    if (!sessionStorage.getItem('sectionKiosk')) {
+      sessionStorage.setItem('sectionKiosk', '#kiosk-div1');
+    }
+    // Shows home
+    kioskScript.goToSection(sessionStorage.getItem('sectionKiosk'));
+  },
+
+  /**
+   * Set section visibility
+   */
+  setSectionsVisibility: () => {
+    const activeSection = sessionStorage.getItem('sectionKiosk');
+    for (let idxSection in kioskScript.SECTIONS) {
+      const section = kioskScript.SECTIONS[idxSection];
+      if (section === activeSection) {
+        document.querySelector(section).removeAttribute('hidden');
+      } else {
+        document.querySelector(section).setAttribute('hidden', '');
+      }
+    }
+  },
+
+  /**
+   * Go to a section
+   */
+  goToSection: (section) => {
+    sessionStorage.setItem('sectionKiosk', section);
+    kioskScript.setSectionsVisibility();
+  },
+
+  /**
+   * onUserLeft event handler
+   */
+  onUserLeft: () => {
+    kioskScript.goToSection('#kiosk-div1');
+  },
+
+  /**
+   * onvisibilitychange event handler
+   */
+  onvisibilitychange: () => {
+    if (document.hidden) {
+      kioskScript.onUserLeft();
+    }
   },
 
   /**
@@ -43,7 +156,18 @@ const kioskScript = {
 
     document.querySelector('#title-h1').innerHTML = kioskDescriptor['title'];
     document.querySelector('#desc-p').innerHTML = kioskDescriptor['text_intro'];
-    document.querySelector('#kiosk-section1').style.backgroundImage = `url(${kioskDescriptor['visual']})`;
+    const bckgd = `url(${kioskDescriptor['visual']})`;
+    document.querySelector('#kiosk-section2').style.backgroundImage = bckgd;
+    document.querySelector('#kiosk-section3').style.backgroundImage = bckgd;
+    document.querySelector('#kiosk-section4').style.backgroundImage = bckgd;
+
+    if (Object.hasOwn(kioskDescriptor, 'show_introduction_page')) {
+      kioskScript._showIntroSection = kioskDescriptor['show_introduction_page']
+    }
+
+    if (Object.hasOwn(kioskDescriptor, 'show_navigation_page')) {
+      kioskScript._showNavigationSection = kioskDescriptor['show_navigation_page']
+    }
 
     for (let collection of collections) {
       kioskScript.loadCollection(collection);
@@ -59,22 +183,25 @@ const kioskScript = {
     const nbRealmsLastLine = realms.length % kioskScript.NB_CARDS_PER_ROW;
 
     // Adds Title and description if needed
-    const level1Div = document.createElement('div');
-    level1Div.setAttribute('class', 'level1');
-    const titleH2 = document.createElement('h2');
-    titleH2.setAttribute('class', 'title');
-    if (Object.hasOwn(collection, 'title')) {
-      titleH2.innerHTML = collection['title'];
-    }
-    level1Div.appendChild(titleH2);
+    if (Object.hasOwn(collection, 'title') || Object.hasOwn(collection, 'desc')) {
+      const level1Div = document.createElement('div');
+      level1Div.setAttribute('class', 'level1');
+      
+      if (Object.hasOwn(collection, 'title')) {
+        const titleH2 = document.createElement('h2');
+        titleH2.setAttribute('class', 'title');
+        titleH2.innerHTML = collection['title'];
+        level1Div.appendChild(titleH2);
+      }
 
-    const descP = document.createElement('p');
-    descP.setAttribute('class', 'note');
-    if (Object.hasOwn(collection, 'desc')) {
-      descP.innerHTML = collection['desc'];
+      if (Object.hasOwn(collection, 'desc')) {
+        const descP = document.createElement('p');
+        descP.setAttribute('class', 'note');
+        descP.innerHTML = collection['desc'];
+        level1Div.appendChild(descP);
+      }
+      document.querySelector('#kiosk-section4').appendChild(level1Div);
     }
-    level1Div.appendChild(descP);
-    document.querySelector('#kiosk-section2').appendChild(level1Div);
 
     // Adds nbLines lines of realms
     for (let i=0; i < nbLines; i++) {
@@ -91,7 +218,7 @@ const kioskScript = {
         );
         rowDiv.appendChild(cardDiv);
       }
-      document.querySelector('#kiosk-section2').appendChild(rowDiv);
+      document.querySelector('#kiosk-section4').appendChild(rowDiv);
     }
     
     // Adds the last line of realms
@@ -116,22 +243,22 @@ const kioskScript = {
         rowDiv.appendChild(cardDiv);
       }
 
-      document.querySelector('#kiosk-section2').appendChild(rowDiv);
+      document.querySelector('#kiosk-section4').appendChild(rowDiv);
     }
   },
 
   createCard: (name, desc, url, visual) => {
     const cardDiv = document.createElement('div');
     cardDiv.setAttribute('class', 'card');
+    cardDiv.addEventListener('click', () => {
+      document.removeEventListener('visibilitychange', kioskScript.onvisibilitychange);
+      window.location.href = url;
+    });
 
     const visualDiv = document.createElement('div');
     visualDiv.setAttribute('class', 'visual');
     visualDiv.style.backgroundImage = `url(${visual})`;
-    
-    const hlink = document.createElement('a');
-    hlink.setAttribute('href', url);
-    hlink.innerHTML = name;
-    visualDiv.appendChild(hlink);
+    visualDiv.innerHTML = name;
     
     const descDiv = document.createElement('div');
     descDiv.setAttribute('class', 'desc');

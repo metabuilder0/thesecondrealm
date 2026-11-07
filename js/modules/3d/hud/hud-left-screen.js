@@ -30,6 +30,7 @@ class HUDLeftScreen extends ThreeMeshUI.Block {
    */
 
   world3d = null;
+  hud = null;
 
   width = null;
   height = null;
@@ -55,7 +56,7 @@ class HUDLeftScreen extends ThreeMeshUI.Block {
   /*
    * Constuctor
    */
-  constructor(world3d, width, height) {
+  constructor(world3d, hud, width, height) {
     super({
       ref: 'container',
       padding: 0.02,
@@ -74,6 +75,7 @@ class HUDLeftScreen extends ThreeMeshUI.Block {
     });
     
     this.world3d = world3d;
+    this.hud = hud;
     this.width = width;
     this.height = height;
 
@@ -393,6 +395,7 @@ class HUDLeftScreen extends ThreeMeshUI.Block {
   dispose() {
     // Resets the references to others objects
     this.world3d = null;
+    this.hud = null;
     this.#subBlock1 = null;
     this.#subBlockMsgContent1 = null;
     this.#subBlockMsgContent1Text = null;
