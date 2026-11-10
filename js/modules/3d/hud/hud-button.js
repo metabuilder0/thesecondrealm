@@ -138,4 +138,110 @@ function createHudButton(world3d, options) {
   return button;
 }
 
-export { createHudButton };
+/*
+ * Toggle styled like the HELP control of HUDRightMenu.
+ * An even click count (including zero) leaves the button released:
+ * black background, and a hover that only thickens the border.
+ * An odd click count latches it on: cyan background at rest and on hover.
+ * Press is cyan either way. onToggle receives true when the button latches on.
+ */
+function createHudToggleButton(world3d, options) {
+  const {
+    width,
+    height,
+    label,
+    fontSize = 0.006,
+    margin = 0.002,
+    onToggle
+  } = options;
+
+  const button = new ThreeMeshUI.Block({
+    width: width,
+    height: height,
+    margin: margin,
+    padding: 0.005,
+    offset: 0.0001,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center',
+    backgroundOpacity: 0.5,
+    backgroundColor: BACKGROUND,
+    fontColor: FONT_COLOR,
+    borderRadius: [0, 0, 0, 0],
+    borderWidth: 0.0002,
+    borderColor: BORDER_COLOR,
+    borderOpacity: 1
+  });
+
+  button.setupState({
+    state: 'hovered_on',
+    attributes: {
+      borderWidth: 0.0015,
+      backgroundColor: HOVER_BACKGROUND
+    }
+  });
+
+  button.setupState({
+    state: 'hovered_off',
+    attributes: {
+      borderWidth: 0.0015,
+      backgroundColor: BACKGROUND
+    }
+  });
+
+  button.setupState({
+    state: 'pressed',
+    attributes: {
+      borderWidth: 0.0015,
+      backgroundColor: HOVER_BACKGROUND
+    }
+  });
+
+  button.setupState({
+    state: 'idle_on',
+    attributes: {
+      borderWidth: 0.0002,
+      backgroundColor: HOVER_BACKGROUND
+    }
+  });
+
+  button.setupState({
+    state: 'idle_off',
+    attributes: {
+      borderWidth: 0.0002,
+      backgroundColor: BACKGROUND
+    }
+  });
+
+  const text = new ThreeMeshUI.Text({
+    content: label,
+    offset: 0,
+    fontSize: fontSize
+  });
+  button.add(text);
+
+  button.userData.hudActive = false;
+
+  world3d.xrManager.makeInteractive(button, {
+    onPointerOver: (intersection) => {
+      const controller = world3d.xrManager.controllers[intersection.idxController];
+      if (controller == null) return;
+      controller.xrInputSource.gamepad.hapticActuators?.[0]?.pulse(0.4, 100);
+      button.setState(button.userData.hudActive ? 'hovered_on' : 'hovered_off');
+    },
+    onPointerOut: () => {
+      button.setState(button.userData.hudActive ? 'idle_on' : 'idle_off');
+    },
+    onPress: () => {
+      button.setState('pressed');
+    },
+    onClick: () => {
+      button.userData.hudActive = !button.userData.hudActive;
+      if (onToggle) onToggle(button.userData.hudActive);
+    }
+  });
+
+  return button;
+}
+
+export { createHudButton, createHudToggleButton };
