@@ -48,7 +48,7 @@ function createHudButton(world3d, options) {
     state: 'hovered',
     attributes: {
       borderWidth: 0.0015,
-      backgroundColor: HOVER_BACKGROUND,
+      backgroundColor: BACKGROUND,
       borderColor: BORDER_COLOR
     }
   });
