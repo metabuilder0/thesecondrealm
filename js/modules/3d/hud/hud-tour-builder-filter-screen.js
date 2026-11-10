@@ -256,6 +256,7 @@ class HUDTourBuilderFilterScreen extends ThreeMeshUI.Block {
         this.panel.addFilterCondition(this.#stageIndex, entry.g);
       }
     });
+
     const attrButton = createHudButton(this.world3d, {
       width: 0.05,
       height: buttonHeight,
@@ -267,6 +268,7 @@ class HUDTourBuilderFilterScreen extends ThreeMeshUI.Block {
         this.panel.cycleFilterAttribute(this.#stageIndex, entry.g, entry.c);
       }
     });
+
     const minButton = createHudButton(this.world3d, {
       width: 0.074,
       height: buttonHeight,
@@ -278,6 +280,7 @@ class HUDTourBuilderFilterScreen extends ThreeMeshUI.Block {
         this.panel.editFilterBound(this.#stageIndex, entry.g, entry.c, 'min');
       }
     });
+
     const dash = new ThreeMeshUI.Block({
       width: 0.012,
       height: height,
@@ -289,11 +292,13 @@ class HUDTourBuilderFilterScreen extends ThreeMeshUI.Block {
       backgroundOpacity: 0,
       borderWidth: 0
     });
+
     dash.add(new ThreeMeshUI.Text({
       content: '-',
       offset: 0,
       fontSize: 0.007
     }));
+
     const maxButton = createHudButton(this.world3d, {
       width: 0.074,
       height: buttonHeight,
@@ -305,6 +310,7 @@ class HUDTourBuilderFilterScreen extends ThreeMeshUI.Block {
         this.panel.editFilterBound(this.#stageIndex, entry.g, entry.c, 'max');
       }
     });
+    
     const delButton = createHudButton(this.world3d, {
       width: 0.03,
       height: buttonHeight,
