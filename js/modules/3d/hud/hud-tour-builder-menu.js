@@ -38,8 +38,6 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
   #spawnButton = null;
   #typeButton = null;
   #modeButton = null;
-  //#cycleMark = null;
-  //#cycleMaterial = null;
 
 
   /*
@@ -102,6 +100,7 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
       fontSize: buttonFontSize,
       onClick: () => this.panel.addStage()
     });
+
     this.#exportButton = createHudButton(this.world3d, {
       width: buttonWidth,
       height: buttonHeight,
@@ -109,6 +108,7 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
       fontSize: buttonFontSize,
       onClick: () => this.panel.exportTour()
     });
+    
     this.#typeButton = createHudButton(this.world3d, {
       width: buttonWidth,
       height: buttonHeight,
@@ -116,10 +116,7 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
       fontSize: buttonFontSize,
       onClick: () => this.panel.cycleType()
     });
-    //this.#cycleMark = HUDTourBuilderMenu.buildCycleMark();
-    //this.#cycleMaterial = this.#cycleMark.userData.material;
-    //this.#cycleMark.position.set(buttonWidth / 2 - 0.009, 0, 0.002);
-    //this.#typeButton.add(this.#cycleMark);
+    
     this.#modeButton = createHudButton(this.world3d, {
       width: buttonWidth,
       height: buttonHeight,
@@ -127,6 +124,7 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
       fontSize: buttonFontSize,
       onClick: () => this.panel.toggleMode()
     });
+    
     this.#spawnButton = createHudButton(this.world3d, {
       width: buttonWidth,
       height: buttonHeight,
@@ -153,7 +151,6 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
     this.#spawnButton.setEnabled(editing);
     this.#typeButton.setEnabled(editing);
     this.#typeButton.setLabel(TYPE_LABELS[type] || 'TYPE');
-    //this.#cycleMaterial.color.set(editing ? 0x10faef : 0x1a3a3c);
     this.#modeButton.setLabel(editing ? 'TEST' : 'EDIT');
   }
 
@@ -188,10 +185,6 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
    * Dispose the object
    */
   dispose() {
-    //if (this.#cycleMark) {
-      //this.#cycleMark.userData.geometry.dispose();
-      //this.#cycleMaterial.dispose();
-    //}
     this.world3d = null;
     this.hud = null;
     this.panel = null;
@@ -200,8 +193,6 @@ class HUDTourBuilderMenu extends ThreeMeshUI.Block {
     this.#spawnButton = null;
     this.#typeButton = null;
     this.#modeButton = null;
-    //this.#cycleMark = null;
-    //this.#cycleMaterial = null;
   }
 
 }
